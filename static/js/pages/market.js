@@ -1,0 +1,1 @@
+window.BasketIQMarket = window.BasketIQMarket || {};

@@ -1,0 +1,424 @@
+<!-- ═══════════════════════════════════════════════════════════════════
+     spinwheel.html — Spin & Win Discount Coupon Wheel
+     Include this component in any page to add the spin wheel overlay.
+     ═══════════════════════════════════════════════════════════════════ -->
+
+<!-- Spin Wheel Modal Overlay -->
+<div id="spinWheelOverlay" style="
+  display:none;position:fixed;inset:0;z-index:9500;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);
+  animation:swFadeIn .35s ease;
+">
+  <div id="spinWheelModal" style="
+    position:relative;width:96%;max-width:440px;
+    background:linear-gradient(145deg,#1B4332 0%,#0D2818 100%);
+    border-radius:28px;padding:2rem 1.5rem 1.5rem;
+    box-shadow:0 32px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(248,245,238,.08);
+    text-align:center;
+    animation:swScaleIn .4s cubic-bezier(.22,1,.36,1);
+  ">
+    <!-- Close button -->
+    <button onclick="_swClose()" style="
+      position:absolute;top:1rem;right:1rem;width:32px;height:32px;
+      border-radius:50%;border:1.5px solid rgba(248,245,238,.2);background:none;
+      color:rgba(248,245,238,.5);font-size:1rem;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:all .2s;z-index:2;
+    " onmouseenter="this.style.borderColor='#D4A843';this.style.color='#D4A843'"
+       onmouseleave="this.style.borderColor='rgba(248,245,238,.2)';this.style.color='rgba(248,245,238,.5)'">✕</button>
+
+    <!-- Header -->
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#D4A843;margin-bottom:.4rem;">✦ Spin & Win</div>
+      <h2 style="font-family:'Playfair Display','Georgia',serif;font-size:1.6rem;font-weight:700;color:#F8F5EE;line-height:1.2;margin:0 0 .3rem 0;">Try Your Luck!</h2>
+      <p style="font-size:.82rem;color:rgba(248,245,238,.45);margin:0;">Spin the wheel to win exclusive discounts</p>
+    </div>
+
+    <!-- Wheel Container -->
+    <div style="position:relative;width:300px;height:300px;margin:0 auto 1.5rem;">
+      <!-- Pointer triangle -->
+      <div style="
+        position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:5;
+        width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;
+        border-top:24px solid #D4A843;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));
+      "></div>
+      <!-- Center hub -->
+      <div style="
+        position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;
+        width:54px;height:54px;border-radius:50%;
+        background:linear-gradient(135deg,#D4A843,#b8912f);
+        box-shadow:0 4px 16px rgba(212,168,67,.4);
+        display:flex;align-items:center;justify-content:center;
+        font-size:.7rem;font-weight:800;color:#0a0a09;
+        letter-spacing:.04em;
+      ">SPIN</div>
+      <!-- Canvas -->
+      <canvas id="spinWheelCanvas" width="300" height="300" style="width:300px;height:300px;border-radius:50%;"></canvas>
+    </div>
+
+    <!-- Spin Button -->
+    <button id="spinBtn" onclick="_swSpin()" style="
+      width:100%;height:52px;border:none;border-radius:50px;
+      background:linear-gradient(135deg,#D4A843 0%,#b8912f 100%);
+      color:#0a0a09;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:800;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;
+      transition:transform .15s,box-shadow .2s;
+      box-shadow:0 4px 20px rgba(212,168,67,.3);
+      letter-spacing:.02em;
+    " onmouseenter="this.style.transform='scale(1.02)';this.style.boxShadow='0 6px 28px rgba(212,168,67,.45)'"
+       onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(212,168,67,.3)'">
+      <span class="material-symbols-outlined" style="font-size:1.2rem;">casino</span>
+      Spin the Wheel!
+    </button>
+
+    <!-- Daily spin notice (disabled text during test) -->
+    <p style="font-size:.7rem;color:rgba(248,245,238,.3);margin-top:.75rem;">
+      🎯 Spin as many times as you like! <strong style="color:rgba(248,245,238,.55);">(Test Mode)</strong>
+    </p>
+  </div>
+
+  <!-- Prize Won Popup (hidden by default) -->
+  <div id="spinPrizePopup" style="
+    display:none;position:absolute;inset:0;z-index:10;
+    align-items:center;justify-content:center;
+  ">
+    <div style="
+      background:linear-gradient(145deg,#1B4332 0%,#0f301e 100%);
+      border-radius:24px;padding:2.5rem 2rem;max-width:380px;width:90%;
+      text-align:center;
+      box-shadow:0 24px 60px rgba(0,0,0,.5);
+      animation:swScaleIn .4s cubic-bezier(.22,1,.36,1);
+    ">
+      <div id="prizeIcon" style="
+        width:80px;height:80px;border-radius:50%;margin:0 auto 1rem;
+        background:rgba(212,168,67,.12);border:2px solid rgba(212,168,67,.25);
+        display:flex;align-items:center;justify-content:center;font-size:2.2rem;
+      ">🎉</div>
+      <h3 id="prizeTitle" style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#F8F5EE;margin:0 0 .3rem;">Congratulations!</h3>
+      <p id="prizeDesc" style="font-size:.85rem;color:rgba(248,245,238,.5);margin:0 0 1.25rem;">You won a discount!</p>
+      
+      <!-- Coupon code box -->
+      <div id="couponBox" style="
+        background:rgba(248,245,238,.06);border:1.5px dashed rgba(212,168,67,.4);
+        border-radius:14px;padding:1rem;margin-bottom:1.25rem;
+      ">
+        <div style="font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,245,238,.35);margin-bottom:.3rem;">Your Coupon Code</div>
+        <div id="couponCode" style="font-family:monospace;font-size:1.4rem;font-weight:800;color:#D4A843;letter-spacing:.1em;">BIQWIN10</div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div id="prizeActions" style="display:flex;gap:.75rem;">
+        <button id="copyBtn" onclick="_swCopyCoupon()" style="
+          flex:1;height:46px;border:1.5px solid rgba(248,245,238,.15);border-radius:50px;
+          background:none;color:#F8F5EE;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;
+          cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem;
+          transition:all .2s;
+        " onmouseenter="this.style.borderColor='#D4A843';this.style.color='#D4A843'"
+           onmouseleave="this.style.borderColor='rgba(248,245,238,.15)';this.style.color='#F8F5EE'">
+          <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span>
+          Copy Code
+        </button>
+        <button id="shopBtn" onclick="_swApplyAndClose()" style="
+          flex:1;height:46px;border:none;border-radius:50px;
+          background:linear-gradient(135deg,#D4A843,#b8912f);
+          color:#0a0a09;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;
+          cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem;
+          transition:transform .15s;
+        " onmouseenter="this.style.transform='scale(1.02)'"
+           onmouseleave="this.style.transform='scale(1)'">
+          <span class="material-symbols-outlined" style="font-size:1rem;">shopping_cart</span>
+          Shop Now
+        </button>
+        <button id="tryAgainBtn" onclick="_swClose()" style="
+          display:none;flex:1;height:46px;border:none;border-radius:50px;
+          background:rgba(248,245,238,.1);color:#F8F5EE;
+          font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;
+          cursor:pointer;align-items:center;justify-content:center;
+          transition:background .2s;
+        " onmouseenter="this.style.background='rgba(248,245,238,.2)'"
+           onmouseleave="this.style.background='rgba(248,245,238,.1)'">
+          Okay
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes swFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes swScaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes swConfetti{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(120px) rotate(720deg);opacity:0}
+}
+.sw-confetti{
+  position:absolute;width:8px;height:8px;border-radius:2px;
+  animation:swConfetti 1.2s ease-out forwards;pointer-events:none;
+}
+/* Spin wheel navbar button glow */
+@keyframes swNavGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(212,168,67,0)}
+  50%{box-shadow:0 0 0 6px rgba(212,168,67,.2)}
+}
+#navSpinBtn{animation:swNavGlow 2.5s ease-in-out infinite}
+#navSpinBtn:hover{animation:none;box-shadow:0 0 0 4px rgba(212,168,67,.3)}
+</style>
+
+<script>
+(function(){
+  /* ── Wheel Segments ─────────────────────────────── */
+  const _swSegments = [
+    { label: '5% OFF',        discount: 5,  code: 'BIQ5',    color: '#2D6A4F', icon: 'local_offer' },
+    { label: 'Better Luck!',  discount: 0,  code: '',        color: '#1a1c1b', icon: 'sentiment_dissatisfied' },
+    { label: '10% OFF',       discount: 10, code: 'BIQ10',   color: '#40916C', icon: 'percent' },
+    { label: 'Free Delivery', discount: -1, code: 'BIQFREE', color: '#2D6A4F', icon: 'local_shipping' },
+    { label: '15% OFF',       discount: 15, code: 'BIQ15',   color: '#1B4332', icon: 'stars' },
+    { label: 'Better Luck!',  discount: 0,  code: '',        color: '#1a1c1b', icon: 'sentiment_dissatisfied' },
+    { label: '20% OFF',       discount: 20, code: 'BIQ20',   color: '#2D6A4F', icon: 'redeem' },
+    { label: '₹50 OFF',       discount: 50, code: 'BIQ50F',  color: '#1B4332', icon: 'payments', isFlat: true },
+  ];
+
+  const _swArc = (2 * Math.PI) / _swSegments.length;
+  let _swAngle = 0;
+  let _swSpinning = false;
+
+  /* ── Draw Wheel ──────────────────────────────────── */
+  function _swDraw() {
+    const c = document.getElementById('spinWheelCanvas');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const cx = 150, cy = 150, r = 148;
+
+    ctx.clearRect(0, 0, 300, 300);
+
+    _swSegments.forEach((seg, i) => {
+      const start = _swAngle + i * _swArc;
+      const end   = start + _swArc;
+
+      // Segment fill
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, end);
+      ctx.closePath();
+      ctx.fillStyle = seg.color;
+      ctx.fill();
+
+      // Segment border
+      ctx.strokeStyle = 'rgba(248,245,238,.08)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Gold edge highlight
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, start, end);
+      ctx.strokeStyle = 'rgba(212,168,67,.15)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Text
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(start + _swArc / 2);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#F8F5EE';
+
+      // Label (Now larger and perfectly centered since we removed the icon from the canvas)
+      ctx.font = 'bold 12px "DM Sans", sans-serif';
+      ctx.fillText(seg.label, r * 0.65, 4);
+
+      ctx.restore();
+    });
+
+    // Outer ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'rgba(212,168,67,.3)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Inner circle mask
+    ctx.beginPath();
+    ctx.arc(cx, cy, 24, 0, 2 * Math.PI);
+    ctx.fillStyle = '#0D2818';
+    ctx.fill();
+  }
+
+  /* ── Spin Logic ──────────────────────────────────── */
+  window._swSpin = function() {
+    if (_swSpinning) return;
+
+    // Check daily limit (TEMPORARILY DISABLED FOR TESTING)
+    // const today = new Date().toDateString();
+    // const lastSpin = localStorage.getItem('biq_last_spin');
+    // if (lastSpin === today) {
+    //   alert('You\'ve already spun today! Come back tomorrow for another chance.');
+    //   return;
+    // }
+
+    _swSpinning = true;
+    document.getElementById('spinBtn').style.opacity = '0.6';
+    document.getElementById('spinBtn').style.pointerEvents = 'none';
+
+    // Weighted random: "Better Luck" is more likely
+    const weights = [15, 25, 12, 10, 8, 25, 3, 2];  // index matches segments
+    const totalW  = weights.reduce((a, b) => a + b, 0);
+    let rand = Math.random() * totalW;
+    let winIdx = 0;
+    for (let i = 0; i < weights.length; i++) {
+      rand -= weights[i];
+      if (rand <= 0) { winIdx = i; break; }
+    }
+
+    // Calculate target angle so pointer lands on winning segment
+    const targetSegCenter = winIdx * _swArc + _swArc / 2;
+    const pointerAngle = -Math.PI / 2; // pointer is at top
+    const extraSpins = (4 + Math.floor(Math.random() * 3)) * 2 * Math.PI;
+    const targetAngle = extraSpins - targetSegCenter + pointerAngle;
+
+    const startAngle = _swAngle;
+    const duration = 4000 + Math.random() * 1000;
+    const startTime = performance.now();
+
+    function animate(now) {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      // Cubic ease-out for realistic deceleration
+      const ease = 1 - Math.pow(1 - t, 3);
+      _swAngle = startAngle + (targetAngle - startAngle) * ease;
+      _swDraw();
+
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        _swSpinning = false;
+        // localStorage.setItem('biq_last_spin', today); // DISABLED FOR TESTING
+        document.getElementById('spinBtn').style.opacity = '1';
+        document.getElementById('spinBtn').style.pointerEvents = 'auto';
+        _swShowPrize(winIdx);
+      }
+    }
+    requestAnimationFrame(animate);
+  };
+
+  /* ── Show Prize ──────────────────────────────────── */
+  function _swShowPrize(idx) {
+    const seg = _swSegments[idx];
+    const popup = document.getElementById('spinPrizePopup');
+    const icon  = document.getElementById('prizeIcon');
+    const title = document.getElementById('prizeTitle');
+    const desc  = document.getElementById('prizeDesc');
+    const code  = document.getElementById('couponCode');
+    const box   = document.getElementById('couponBox');
+
+    if (seg.discount === 0) {
+      icon.innerHTML = '<span class="material-symbols-outlined" style="color:rgba(248,245,238,.6);font-size:2.8rem;">sentiment_dissatisfied</span>';
+      icon.style.background = 'rgba(248,245,238,.05)';
+      icon.style.borderColor = 'rgba(248,245,238,.1)';
+      title.textContent = 'Better Luck Next Time!';
+      desc.textContent = 'Keep trying! You can spin again tomorrow.';
+      box.style.display = 'none';
+      
+      // Hide copy/shop, show try again
+      document.getElementById('copyBtn').style.display = 'none';
+      document.getElementById('shopBtn').style.display = 'none';
+      document.getElementById('tryAgainBtn').style.display = 'flex';
+
+    } else {
+      icon.innerHTML = '<span class="material-symbols-outlined" style="color:#D4A843;font-size:3.2rem;">workspace_premium</span>';
+      icon.style.background = 'rgba(212,168,67,.12)';
+      icon.style.borderColor = 'rgba(212,168,67,.25)';
+      if (seg.discount === -1) {
+        title.textContent = 'Free Delivery!';
+        desc.textContent = 'Your next order ships free!';
+      } else if (seg.isFlat) {
+        title.textContent = `₹${seg.discount} OFF!`;
+        desc.textContent = `Flat ₹${seg.discount} off on your next order!`;
+      } else {
+        title.textContent = `${seg.discount}% OFF!`;
+        desc.textContent = `Get ${seg.discount}% off on your next order!`;
+      }
+      code.textContent = seg.code;
+      box.style.display = 'block';
+
+      // Show copy/shop, hide try again
+      document.getElementById('copyBtn').style.display = 'flex';
+      document.getElementById('shopBtn').style.display = 'flex';
+      document.getElementById('tryAgainBtn').style.display = 'none';
+
+      // Save coupon
+      const coupons = JSON.parse(localStorage.getItem('biq_coupons') || '[]');
+      coupons.push({
+        code: seg.code,
+        discount: seg.discount,
+        isFlat: seg.isFlat || false,
+        isFreeDelivery: seg.discount === -1,
+        label: seg.label,
+        won_at: new Date().toISOString(),
+      });
+      localStorage.setItem('biq_coupons', JSON.stringify(coupons));
+    }
+
+    popup.style.display = 'flex';
+    _swConfetti();
+  }
+
+  /* ── Confetti ────────────────────────────────────── */
+  function _swConfetti() {
+    const overlay = document.getElementById('spinWheelOverlay');
+    const colors = ['#D4A843', '#F8F5EE', '#2D6A4F', '#e55e3a', '#40916C', '#FFD700'];
+    for (let i = 0; i < 40; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'sw-confetti';
+      dot.style.left = (20 + Math.random() * 60) + '%';
+      dot.style.top = (20 + Math.random() * 30) + '%';
+      dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+      dot.style.animationDelay = (Math.random() * 0.5) + 's';
+      dot.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+      dot.style.width = (5 + Math.random() * 6) + 'px';
+      dot.style.height = (5 + Math.random() * 6) + 'px';
+      overlay.appendChild(dot);
+      setTimeout(() => dot.remove(), 2000);
+    }
+  }
+
+  /* ── Copy Coupon ─────────────────────────────────── */
+  window._swCopyCoupon = function() {
+    const code = document.getElementById('couponCode').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = event.target.closest('button');
+      btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">check</span> Copied!';
+      setTimeout(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy Code';
+      }, 2000);
+    });
+  };
+
+  /* ── Apply & Close ───────────────────────────────── */
+  window._swApplyAndClose = function() {
+    _swClose();
+    window.location.href = '/index/';
+  };
+
+  /* ── Open/Close ──────────────────────────────────── */
+  window._swOpen = function() {
+    const overlay = document.getElementById('spinWheelOverlay');
+    overlay.style.display = 'flex';
+    document.getElementById('spinPrizePopup').style.display = 'none';
+    _swDraw();
+  };
+
+  window._swClose = function() {
+    document.getElementById('spinWheelOverlay').style.display = 'none';
+    document.getElementById('spinPrizePopup').style.display = 'none';
+  };
+
+  // Close on outside click
+  document.getElementById('spinWheelOverlay')?.addEventListener('click', (e) => {
+    if (e.target.id === 'spinWheelOverlay') _swClose();
+  });
+
+  // Draw initial wheel
+  setTimeout(_swDraw, 100);
+})();
+</script>

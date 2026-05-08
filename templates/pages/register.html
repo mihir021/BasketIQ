@@ -1,0 +1,621 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Create Account | BasketIQ — Your Smart Kitchen</title>
+<meta name="description" content="Join BasketIQ — the AI-powered grocery platform that predicts what your kitchen needs. Sign up for free today."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+/* ── Reset ────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;font-size:16px}
+body{font-family:'DM Sans',sans-serif;height:100%;min-height:100vh;overflow-x:hidden;background:#F8F5EE;cursor:none}
+
+/* ── Custom Cursor ────────────────────────────────────────── */
+.cursor{position:fixed;width:10px;height:10px;background:#D4A843;border-radius:50%;pointer-events:none;z-index:9999;transition:transform .12s ease;mix-blend-mode:multiply}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1.5px solid rgba(27,67,50,.4);border-radius:50%;pointer-events:none;z-index:9998;transition:transform .25s ease,border-color .3s ease;transform:translate(-50%,-50%)}
+
+/* ── Layout: Split Screen ─────────────────────────────────── */
+.split-screen{display:grid;grid-template-columns:60fr 40fr;min-height:100vh}
+@media(max-width:900px){.split-screen{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════════════════════
+   LEFT PANEL — Story Side  (Charcoal/Dark for variety)
+═══════════════════════════════════════════════════════════ */
+.panel-left{
+  background:#1B4332;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  padding:3rem 4rem;min-height:420px;
+  transform:translateX(-100%);
+  animation:slideInLeft .9s cubic-bezier(.22,1,.36,1) .1s forwards;
+}
+@keyframes slideInLeft{to{transform:translateX(0)}}
+
+/* Grain overlay */
+.panel-left::before{
+  content:'';position:absolute;inset:0;opacity:.045;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1;
+}
+
+/* Radial glow */
+.panel-left::after{
+  content:'';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:700px;height:700px;
+  background:radial-gradient(circle,rgba(45,106,79,.55) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* Food floats */
+.food-float{
+  position:absolute;z-index:2;border-radius:50%;overflow:hidden;
+  filter:drop-shadow(0 16px 40px rgba(0,0,0,.4));
+}
+.food-float img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+
+.ff1{width:120px;height:120px;top:7%;   left:5%;   animation:floatA 9s  ease-in-out infinite}
+.ff2{width:95px; height:95px; top:12%;  right:7%;  animation:floatB 13s ease-in-out infinite}
+.ff3{width:105px;height:105px;bottom:10%;left:7%;  animation:floatC 10s ease-in-out infinite}
+.ff4{width:88px; height:88px; bottom:15%;right:5%; animation:floatA 12s ease-in-out infinite 1.5s}
+.ff5{width:72px; height:72px; top:48%;  left:3%;   animation:floatB 8s  ease-in-out infinite .8s}
+.ff6{width:78px; height:78px; top:52%;  right:4%;  animation:floatC 11s ease-in-out infinite 2s}
+
+@keyframes floatA{0%,100%{transform:translateY(0)    rotate(-4deg)} 50%{transform:translateY(-28px) rotate(4deg)}}
+@keyframes floatB{0%,100%{transform:translateY(-14px) rotate(5deg)} 50%{transform:translateY(18px)  rotate(-5deg)}}
+@keyframes floatC{0%,100%{transform:translateY(-8px)  rotate(0)}    33%{transform:translateY(22px)  rotate(7deg)} 66%{transform:translateY(-4px) rotate(-4deg)}}
+
+/* Left content block */
+.left-content{position:relative;z-index:3;text-align:center;max-width:480px}
+.left-badge{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:rgba(212,168,67,.18);border:1px solid rgba(212,168,67,.35);
+  color:#D4A843;font-size:.7rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:.35rem 1rem;border-radius:100px;margin-bottom:2rem;
+}
+.left-heading{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,3.2rem);
+  font-weight:900;color:#F8F5EE;
+  line-height:1.1;letter-spacing:-.02em;margin-bottom:1.1rem;
+}
+.left-heading em{color:#D4A843;font-style:italic}
+.left-sub{font-size:.95rem;color:rgba(248,245,238,.55);line-height:1.75;max-width:360px;margin:0 auto}
+
+/* Benefit pills */
+.benefit-list{
+  position:relative;z-index:3;
+  display:flex;flex-direction:column;gap:.6rem;
+  margin-top:2.5rem;width:100%;max-width:340px;
+}
+.benefit-item{
+  display:flex;align-items:center;gap:.75rem;
+  background:rgba(248,245,238,.07);
+  border:1px solid rgba(248,245,238,.12);
+  border-radius:12px;padding:.65rem 1rem;
+  backdrop-filter:blur(8px);
+}
+.benefit-icon{font-size:1rem;flex-shrink:0}
+.benefit-text{font-size:.82rem;color:rgba(248,245,238,.7);font-weight:500}
+.benefit-text strong{color:#D4A843;font-weight:700}
+
+/* Social proof chips */
+.proof-chips{
+  position:absolute;bottom:2rem;left:3rem;right:3rem;z-index:3;
+  display:flex;flex-wrap:wrap;gap:.6rem;
+}
+.chip{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(248,245,238,.08);border:1px solid rgba(248,245,238,.14);
+  color:rgba(248,245,238,.65);font-size:.72rem;font-weight:500;
+  padding:.3rem .75rem;border-radius:100px;backdrop-filter:blur(8px);
+}
+.chip strong{color:#D4A843}
+
+@media(max-width:900px){
+  .panel-left{min-height:260px;padding:2.5rem 1.5rem 4.5rem;transform:none;animation:none}
+  .ff1,.ff2,.ff5,.ff6{display:none}
+  .ff3{width:75px;height:75px;bottom:auto;top:1rem;left:1rem}
+  .ff4{width:70px;height:70px;top:1rem;bottom:auto;right:1rem}
+  .benefit-list{display:none}
+  .proof-chips{bottom:1rem;left:1.5rem;right:1.5rem}
+  .left-heading{font-size:1.7rem}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RIGHT PANEL — Form Side
+═══════════════════════════════════════════════════════════ */
+.panel-right{
+  background:#F8F5EE;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  padding:3rem 2.5rem;
+  transform:translateX(60px);opacity:0;
+  animation:slideInRight .9s cubic-bezier(.22,1,.36,1) .25s forwards;
+}
+@keyframes slideInRight{to{transform:translateX(0);opacity:1}}
+
+.form-box{width:100%;max-width:390px}
+
+/* Logo */
+.form-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;margin-bottom:2rem}
+.logo-icon{
+  width:38px;height:38px;background:#1B4332;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;
+}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:#1B4332;letter-spacing:-.02em}
+.logo-text span{color:#D4A843}
+
+/* Headings */
+.form-heading{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,3vw,2.2rem);font-weight:700;color:#2C2C2A;letter-spacing:-.02em;margin-bottom:.35rem}
+.form-subheading{font-size:.88rem;color:rgba(44,44,42,.5);margin-bottom:1.6rem;line-height:1.6}
+
+/* Step indicator */
+.step-bar{display:flex;align-items:center;gap:.4rem;margin-bottom:1.6rem}
+.step-dot{
+  width:8px;height:8px;border-radius:50%;background:rgba(44,44,42,.15);
+  transition:background .3s,transform .3s;
+}
+.step-dot.active{background:#1B4332;transform:scale(1.3)}
+.step-dot.done{background:#D4A843}
+.step-label{font-size:.72rem;color:rgba(44,44,42,.4);font-weight:500;margin-left:.25rem;letter-spacing:.04em}
+
+/* Fields */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.field-group{margin-bottom:.85rem;position:relative}
+.field-group.full{grid-column:1/-1}
+.field-label{display:block;font-size:.72rem;font-weight:600;color:rgba(44,44,42,.55);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+.field-input{
+  width:100%;padding:.8rem 1rem;
+  background:#fff;border:1.5px solid rgba(44,44,42,.14);border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:.9rem;color:#2C2C2A;
+  outline:none;transition:border-color .25s,box-shadow .25s;appearance:none;
+}
+.field-input::placeholder{color:rgba(44,44,42,.28)}
+.field-input:focus{border-color:#1B4332;box-shadow:0 0 0 3.5px rgba(27,67,50,.12)}
+.field-input.error{border-color:#c0392b;box-shadow:0 0 0 3px rgba(192,57,43,.12)}
+
+/* City select row */
+.field-hint{font-size:.7rem;color:rgba(44,44,42,.35);margin-top:.3rem}
+
+/* Password wrapper */
+.pw-wrap{position:relative}
+.pw-wrap .field-input{padding-right:3rem}
+.pw-eye{
+  position:absolute;right:.85rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  color:rgba(44,44,42,.35);line-height:1;transition:color .2s;padding:.2rem;
+}
+.pw-eye:hover{color:#1B4332}
+
+/* Strength bar */
+.pw-strength{height:3px;border-radius:2px;margin-top:.3rem;background:rgba(44,44,42,.08);overflow:hidden}
+.pw-strength-fill{height:100%;width:0;border-radius:2px;transition:width .4s ease,background .4s ease}
+
+/* Submit */
+.btn-signup{
+  width:100%;padding:.95rem 1rem;
+  background:#1B4332;color:#F8F5EE;
+  border:none;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.02em;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.55rem;
+  transition:background .25s,transform .2s,box-shadow .25s;
+  position:relative;overflow:hidden;margin-top:.25rem;
+}
+.btn-signup:hover{background:#2d6a4f;transform:scale(1.02);box-shadow:0 12px 40px rgba(27,67,50,.28)}
+.btn-signup:active{transform:scale(.98)}
+.btn-signup:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-signup .spinner{width:18px;height:18px;border:2.5px solid rgba(248,245,238,.35);border-top-color:#F8F5EE;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:1rem;margin:1.2rem 0;color:rgba(44,44,42,.3);font-size:.78rem;font-weight:500}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(44,44,42,.12)}
+
+/* Google */
+.btn-google{
+  width:100%;padding:.8rem 1rem;
+  background:#fff;border:1.5px solid rgba(44,44,42,.14);border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:600;color:#2C2C2A;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.7rem;
+  transition:border-color .25s,box-shadow .25s,transform .2s;
+}
+.btn-google:hover{border-color:#1B4332;box-shadow:0 4px 20px rgba(27,67,50,.1);transform:translateY(-1px)}
+
+/* Error */
+.error-msg{font-size:.82rem;color:#c0392b;margin-top:.7rem;text-align:center;padding:.55rem 1rem;border-radius:8px;background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.15);display:none}
+.error-msg.show{display:block}
+
+/* Terms */
+.terms-row{margin:.9rem 0;display:flex;align-items:flex-start;gap:.6rem}
+.terms-check{width:15px;height:15px;accent-color:#1B4332;margin-top:.15rem;flex-shrink:0;cursor:pointer}
+.terms-text{font-size:.75rem;color:rgba(44,44,42,.5);line-height:1.5}
+.terms-text a{color:#1B4332;font-weight:600;text-decoration:none}
+.terms-text a:hover{text-decoration:underline}
+
+/* Login link */
+.login-row{margin-top:1.25rem;text-align:center;font-size:.85rem;color:rgba(44,44,42,.5)}
+.login-row a{color:#1B4332;font-weight:700;text-decoration:none;border-bottom:1.5px solid transparent;transition:border-color .2s}
+.login-row a:hover{border-color:#1B4332}
+
+/* Mobile */
+@media(max-width:900px){
+  .panel-right{padding:2rem 1.5rem 3rem;animation:none;transform:none;opacity:1}
+  .field-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="split-screen">
+
+  <!-- ═══ LEFT PANEL ═════════════════════════════════════ -->
+  <div class="panel-left">
+
+    <!-- Floating food photos -->
+    <div class="food-float ff1">
+      <img src="https://loremflickr.com/120/120/apple,fresh,fruit?lock=401" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+    </div>
+    <div class="food-float ff2">
+      <img src="https://loremflickr.com/95/95/wheat,golden,grain?lock=402" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+    </div>
+    <div class="food-float ff3">
+      <img src="https://loremflickr.com/105/105/vegetable,green,fresh?lock=403" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+    </div>
+    <div class="food-float ff4">
+      <img src="https://loremflickr.com/88/88/spice,turmeric,india?lock=404" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+    </div>
+    <div class="food-float ff5">
+      <img src="https://loremflickr.com/72/72/lemon,citrus,yellow?lock=405" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+    </div>
+    <div class="food-float ff6">
+      <img src="https://loremflickr.com/78/78/dairy,milk,fresh?lock=406" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+    <!-- Central content -->
+    <div class="left-content">
+      <div class="left-badge">✦ Join Free Today</div>
+      <h1 class="left-heading">
+        A smarter kitchen<br/><em>starts here.</em>
+      </h1>
+      <p class="left-sub">Tell us who you are and we'll handle the rest — AI-driven predictions, real-time pricing, and a pantry that never runs dry.</p>
+    </div>
+
+    <!-- Benefit pills -->
+    <div class="benefit-list">
+      <div class="benefit-item">
+        <span class="benefit-icon">🧠</span>
+        <span class="benefit-text">AI predicts what you'll need <strong>before</strong> you run out</span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">⚡</span>
+        <span class="benefit-text">Smart pricing saves you <strong>₹180 avg</strong> per order</span>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">🚀</span>
+        <span class="benefit-text">Free delivery on your <strong>first 3 orders</strong></span>
+      </div>
+    </div>
+
+    <!-- Social proof chips -->
+    <div class="proof-chips">
+      <div class="chip">⭐ <strong>4.9/5</strong> Rating</div>
+      <div class="chip">👥 <strong>2.4M</strong> Users</div>
+      <div class="chip">🎁 <strong>Free</strong> to join</div>
+    </div>
+  </div>
+
+  <!-- ═══ RIGHT PANEL ════════════════════════════════════ -->
+  <div class="panel-right">
+    <div class="form-box">
+
+      <!-- Logo -->
+      <a class="form-logo" href="/">
+        <div class="logo-icon">🧺</div>
+        <div class="logo-text">Basket<span>IQ</span></div>
+      </a>
+
+      <!-- Headings -->
+      <h2 class="form-heading">Create account</h2>
+      <p class="form-subheading">Set up your smart kitchen in 30 seconds</p>
+
+      <!-- Step indicator -->
+      <div class="step-bar">
+        <div class="step-dot active" id="s1"></div>
+        <div class="step-dot" id="s2"></div>
+        <div class="step-dot" id="s3"></div>
+        <div class="step-dot" id="s4"></div>
+        <span class="step-label">Fill in your details</span>
+      </div>
+
+      <!-- Form -->
+      <form id="signupForm" novalidate>
+
+        <!-- Name -->
+        <div class="field-group">
+          <label class="field-label" for="name">Full Name</label>
+          <input class="field-input" type="text" id="name" name="name" placeholder="e.g. Priya Sharma" autocomplete="name" required/>
+        </div>
+
+        <!-- Email -->
+        <div class="field-group">
+          <label class="field-label" for="email">Email Address</label>
+          <input class="field-input" type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required/>
+        </div>
+
+        <!-- Password -->
+        <div class="field-group">
+          <label class="field-label" for="password">Password</label>
+          <div class="pw-wrap">
+            <input class="field-input" type="password" id="password" name="password" placeholder="At least 6 characters" autocomplete="new-password" required minlength="6"/>
+            <button type="button" class="pw-eye" id="pwToggle" title="Toggle password">
+              <svg id="eyeOpen" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg id="eyeClosed" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <div class="pw-strength"><div class="pw-strength-fill" id="pwBar"></div></div>
+        </div>
+
+        <!-- City -->
+        <div class="field-group">
+          <label class="field-label" for="location">Your City</label>
+          <input class="field-input" type="text" id="location" name="location" placeholder="e.g. Ahmedabad" autocomplete="address-level2" required/>
+          <p class="field-hint">We use this for local delivery estimates</p>
+        </div>
+
+        <!-- Terms -->
+        <div class="terms-row">
+          <input class="terms-check" type="checkbox" id="terms" required/>
+          <label class="terms-text" for="terms">
+            I agree to BasketIQ's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </label>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-signup" id="submitBtn">
+          <div class="spinner" id="btnSpinner"></div>
+          <span id="btnText">Create My Kitchen →</span>
+        </button>
+
+        <!-- Error -->
+        <div class="error-msg" id="signupError"></div>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">or sign up with</div>
+
+      <!-- Google -->
+      <button class="btn-google" type="button" id="googleSignUpBtn" onclick="triggerGoogleSignIn()">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <!-- Login link -->
+      <p class="login-row">
+        Already have an account? <a href="/login/">Sign In</a>
+      </p>
+
+    </div>
+  </div>
+</div><!-- /.split-screen -->
+
+<script>
+// ── Custom Cursor ──────────────────────────────────────────
+const cursor     = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.transform = `translate(${mx-5}px,${my-5}px)`;
+});
+(function loop() {
+  rx += (mx-rx)*.12; ry += (my-ry)*.12;
+  cursorRing.style.left = rx+'px'; cursorRing.style.top = ry+'px';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,input,label').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursorRing.style.transform='translate(-50%,-50%) scale(1.6)';
+    cursorRing.style.borderColor='rgba(27,67,50,.7)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursorRing.style.transform='translate(-50%,-50%) scale(1)';
+    cursorRing.style.borderColor='rgba(27,67,50,.4)';
+  });
+});
+
+// ── Password Toggle ────────────────────────────────────────
+document.getElementById('pwToggle').addEventListener('click', () => {
+  const pw = document.getElementById('password');
+  const show = pw.type === 'password';
+  pw.type = show ? 'text' : 'password';
+  document.getElementById('eyeOpen').style.display  = show ? 'none' : '';
+  document.getElementById('eyeClosed').style.display = show ? '' : 'none';
+});
+
+// ── Password Strength Bar ──────────────────────────────────
+document.getElementById('password').addEventListener('input', function() {
+  const val = this.value;
+  const bar = document.getElementById('pwBar');
+  let score = 0;
+  if (val.length >= 6)  score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const pct   = (score / 5) * 100;
+  const color = score <= 1 ? '#e74c3c' : score <= 3 ? '#f39c12' : '#1B4332';
+  bar.style.width    = pct + '%';
+  bar.style.background = color;
+  // Step indicator
+  updateSteps(score);
+});
+
+// ── Step indicator ─────────────────────────────────────────
+function updateSteps(pwScore) {
+  const name  = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const loc   = document.getElementById('location').value.trim();
+  const steps = [
+    !!name,
+    !!email,
+    pwScore >= 2,
+    !!loc,
+  ];
+  ['s1','s2','s3','s4'].forEach((id, i) => {
+    const dot = document.getElementById(id);
+    dot.className = 'step-dot';
+    if (steps.slice(0,i).every(Boolean)) dot.classList.add('active');
+    if (steps[i]) dot.classList.add('done');
+  });
+}
+['name','email','location'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => updateSteps(0));
+});
+
+// ── Input real-time error clear ────────────────────────────
+['name','email','password','location'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    this.classList.remove('error');
+    document.getElementById('signupError').classList.remove('show');
+  });
+});
+
+// ── Signup Form Submit ─────────────────────────────────────
+document.getElementById('signupForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const nameEl     = document.getElementById('name');
+  const emailEl    = document.getElementById('email');
+  const passwordEl = document.getElementById('password');
+  const locationEl = document.getElementById('location');
+  const termsEl    = document.getElementById('terms');
+  const btn        = document.getElementById('submitBtn');
+  const spinner    = document.getElementById('btnSpinner');
+  const btnText    = document.getElementById('btnText');
+  const errEl      = document.getElementById('signupError');
+
+  // Clear previous errors
+  errEl.classList.remove('show');
+  [nameEl, emailEl, passwordEl, locationEl].forEach(el => el.classList.remove('error'));
+
+  // Validate
+  if (!nameEl.value.trim())     { nameEl.classList.add('error');     nameEl.focus();     return; }
+  if (!emailEl.value.trim())    { emailEl.classList.add('error');    emailEl.focus();    return; }
+  if (passwordEl.value.length < 6) { passwordEl.classList.add('error'); passwordEl.focus(); return; }
+  if (!locationEl.value.trim()) { locationEl.classList.add('error'); locationEl.focus(); return; }
+  if (!termsEl.checked) {
+    errEl.textContent = 'Please agree to the Terms of Service to continue.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  // Loading state
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  btnText.textContent   = 'Creating your kitchen…';
+
+  try {
+    const response = await fetch('/api/auth/signup/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:     nameEl.value.trim(),
+        email:    emailEl.value.trim(),
+        password: passwordEl.value,
+        location: locationEl.value.trim(),
+      }),
+    });
+
+    let result = {};
+    try { result = await response.json(); } catch (_) {}
+
+    if (response.ok && result.token) {
+      localStorage.setItem('token',          result.token);
+      localStorage.setItem('user_name',      result.name);
+      localStorage.setItem('just_signed_up', 'true');
+      // Success state
+      spinner.style.display = 'none';
+      btnText.textContent   = '✓ Kitchen ready! Redirecting…';
+      btn.style.background  = '#2d6a4f';
+      setTimeout(() => { window.location.href = '/index/'; }, 700);
+    } else {
+      const msg = result.error || result.detail || `Signup failed (${response.status}). Please try again.`;
+      errEl.textContent = msg;
+      errEl.classList.add('show');
+      if (msg.toLowerCase().includes('email')) emailEl.classList.add('error');
+      resetBtn();
+    }
+  } catch (err) {
+    errEl.textContent = 'Cannot reach backend. Make sure the server is running on port 8001.';
+    errEl.classList.add('show');
+    resetBtn();
+  }
+
+  function resetBtn() {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    btnText.textContent   = 'Create My Kitchen →';
+  }
+});
+</script>
+<script>
+function triggerGoogleSignIn() {
+  if (typeof google === 'undefined') { alert('Google is loading, try again.'); return; }
+  google.accounts.id.initialize({
+    client_id: '704764340920-d6jftc1fm4bc2stqd34c5stcard86en1.apps.googleusercontent.com',
+    callback: handleGoogleCredential,
+  });
+  google.accounts.id.prompt();
+}
+async function handleGoogleCredential(response) {
+  const btn = document.getElementById('googleSignUpBtn');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerText = 'Signing in...';
+  try {
+    const res  = await fetch('/api/auth/google/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({credential: response.credential}),
+    });
+    const data = await res.json();
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user_name', data.name);
+      localStorage.setItem('user_email', data.email);
+      window.location.href = '/index/';
+    } else {
+      alert(data.error || 'Google sign-in failed.');
+      btn.disabled = false; btn.innerHTML = orig;
+    }
+  } catch(e) {
+    alert('Network error, please try again.');
+    btn.disabled = false; btn.innerHTML = orig;
+  }
+}
+</script>
+</body>
+</html>

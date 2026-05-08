@@ -1,0 +1,157 @@
+<!-- ═══════════════════════════════════════════════════════════════════
+     navbar.html — Universal top-bar + mobile bottom-nav
+     Usage: include this partial in every page template
+     ═══════════════════════════════════════════════════════════════════ -->
+
+<!-- ── Desktop / Tablet Top Bar ─────────────────────────────────────── -->
+<header id="mainNavbar" class="fixed top-0 w-full z-50 bg-white/85 backdrop-blur-xl shadow-sm">
+  <nav class="flex justify-between items-center max-w-7xl mx-auto px-6 h-20">
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-2 text-xl font-extrabold text-emerald-800 shrink-0">
+      <span class="material-symbols-outlined text-emerald-700">shopping_basket</span>
+      <span>BasketIQ</span>
+    </a>
+
+    <!-- Center nav links (hidden on mobile) -->
+    <div class="hidden md:flex items-center gap-8" id="navLinks">
+      <a href="/index/"              class="nav-link text-sm font-semibold text-zinc-500 hover:text-emerald-700 transition-colors" data-path="/index">Market</a>
+      <a href="/aiGroceryPlanner/"   class="nav-link text-sm font-semibold text-zinc-500 hover:text-emerald-700 transition-colors" data-path="/aiGroceryPlanner">AI Planner</a>
+      <a href="/pantryChef/"         class="nav-link text-sm font-semibold text-zinc-500 hover:text-emerald-700 transition-colors" data-path="/pantryChef">Pantry Chef</a>
+      <a href="/myOrder/"            class="nav-link text-sm font-semibold text-zinc-500 hover:text-emerald-700 transition-colors" data-path="/myOrder">My Orders</a>
+      <a href="/contact/"            class="nav-link text-sm font-semibold text-zinc-500 hover:text-emerald-700 transition-colors" data-path="/contact">Contact Us</a>
+    </div>
+
+    <!-- Right side -->
+    <div class="flex items-center gap-4">
+      <!-- Spin & Win button (visible when logged in) -->
+      <button onclick="_swOpen()" id="navSpinBtn" class="hidden relative p-2 rounded-full transition-all" style="background:rgba(212,168,67,.1);" title="Spin & Win Discounts!">
+        <span class="material-symbols-outlined" style="color:#D4A843;font-variation-settings:'FILL' 1,'wght' 500;">casino</span>
+      </button>
+
+      <!-- Cart icon (visible when logged in) -->
+      <a href="/cart/" class="relative p-2 hover:bg-emerald-50 rounded-full transition-colors hidden" id="navCartBtn">
+        <span class="material-symbols-outlined text-emerald-800">shopping_cart</span>
+        <span id="navCartBadge" class="absolute -top-0.5 -right-0.5 bg-amber-400 text-amber-900 text-[10px] font-extrabold min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow-sm hidden">0</span>
+      </a>
+
+      <!-- Profile (visible when logged in) -->
+      <a href="/profile/" class="hidden items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 transition-colors" id="navProfileBtn">
+        <span class="material-symbols-outlined text-emerald-700 text-lg">person</span>
+        <span class="text-sm font-bold text-emerald-800 max-w-[80px] truncate" id="navUserName"></span>
+      </a>
+
+      <!-- Logout (visible when logged in) -->
+      <button class="hidden text-sm font-bold text-red-500 hover:text-red-700 transition-colors" id="navLogoutBtn" onclick="_navLogout()">Logout</button>
+
+      <!-- Login / Signup (visible when NOT logged in) -->
+      <a href="/login/"  class="hidden text-sm font-bold text-emerald-700 hover:text-emerald-900 transition-colors" id="navLoginBtn">Login</a>
+      <a href="/signup/" class="hidden px-5 py-2.5 bg-emerald-800 text-white text-sm font-bold rounded-full hover:bg-emerald-900 transition-colors shadow-sm" id="navSignupBtn">Start Shopping</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ── Mobile Bottom Nav (≤768 px) ──────────────────────────────────── -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-white/90 backdrop-blur-xl rounded-t-[24px] shadow-[0px_-4px_20px_rgba(26,28,27,0.06)] md:hidden" id="mobileNav">
+  <div class="flex justify-around items-center px-2 pt-3 pb-7">
+    <a href="/index/" class="mob-link flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-zinc-400" data-path="/index">
+      <span class="material-symbols-outlined text-[22px]">storefront</span>
+      <span class="text-[10px] font-bold uppercase mt-0.5 tracking-wide">Market</span>
+    </a>
+    <a href="/aiGroceryPlanner/" class="mob-link flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-zinc-400" data-path="/aiGroceryPlanner">
+      <span class="material-symbols-outlined text-[22px]">auto_awesome</span>
+      <span class="text-[10px] font-bold uppercase mt-0.5 tracking-wide">Planner</span>
+    </a>
+    <a href="/pantryChef/" class="mob-link flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-zinc-400" data-path="/pantryChef">
+      <span class="material-symbols-outlined text-[22px]">skillet</span>
+      <span class="text-[10px] font-bold uppercase mt-0.5 tracking-wide">Pantry</span>
+    </a>
+    <a href="/cart/" class="mob-link relative flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-zinc-400" data-path="/cart">
+      <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+      <span id="mobCartBadge" class="absolute top-0.5 right-2 bg-amber-400 text-amber-900 text-[8px] font-extrabold min-w-[14px] h-[14px] flex items-center justify-center rounded-full hidden">0</span>
+      <span class="text-[10px] font-bold uppercase mt-0.5 tracking-wide">Cart</span>
+    </a>
+    <a href="/contact/" class="mob-link flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-zinc-400" data-path="/contact">
+      <span class="material-symbols-outlined text-[22px]">mail</span>
+      <span class="text-[10px] font-bold uppercase mt-0.5 tracking-wide">Contact</span>
+    </a>
+    <a href="/profile/" class="mob-link flex flex-col items-center justify-center px-4 py-2 rounded-2xl text-zinc-400" data-path="/profile">
+      <span class="material-symbols-outlined text-[22px]">person</span>
+      <span class="text-[10px] font-bold uppercase mt-0.5 tracking-wide">Account</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ── Navbar Init Script ───────────────────────────────────────────── -->
+<script>
+(function _initNavbar() {
+  const token = localStorage.getItem('token');
+  const name  = localStorage.getItem('user_name') || '';
+  const path  = window.location.pathname;
+
+  // ── Auth-aware visibility ──
+  const show = (el) => { if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }};
+  const hide = (el) => { if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }};
+
+  if (token) {
+    show(document.getElementById('navSpinBtn'));
+    show(document.getElementById('navCartBtn'));
+    show(document.getElementById('navProfileBtn'));
+    show(document.getElementById('navLogoutBtn'));
+    hide(document.getElementById('navLoginBtn'));
+    hide(document.getElementById('navSignupBtn'));
+    document.getElementById('navUserName').textContent = name;
+  } else {
+    hide(document.getElementById('navCartBtn'));
+    hide(document.getElementById('navProfileBtn'));
+    hide(document.getElementById('navLogoutBtn'));
+    show(document.getElementById('navLoginBtn'));
+    show(document.getElementById('navSignupBtn'));
+  }
+
+  // ── Active link highlighting ──
+  document.querySelectorAll('.nav-link').forEach(a => {
+    if (path.startsWith(a.dataset.path)) {
+      a.classList.remove('text-zinc-500');
+      a.classList.add('text-emerald-700', 'font-bold');
+    }
+  });
+  document.querySelectorAll('.mob-link').forEach(a => {
+    if (path.startsWith(a.dataset.path)) {
+      a.classList.remove('text-zinc-400');
+      a.classList.add('bg-emerald-100', 'text-emerald-900');
+      a.querySelector('.material-symbols-outlined')?.setAttribute('style', "font-variation-settings: 'FILL' 1;");
+    }
+  });
+
+  // ── Cart badge ──
+  _navRefreshCart();
+})();
+
+function _navLogout() {
+  localStorage.clear();
+  window.location.href = '/login/';
+}
+
+async function _navRefreshCart() {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  try {
+    const res = await fetch('/api/cart/', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    const count = Array.isArray(data) ? data.length : 0;
+    _navSetCartCount(count);
+  } catch(e) { /* silent */ }
+}
+
+function _navSetCartCount(n) {
+  ['navCartBadge','mobCartBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (n > 0) { el.textContent = n; el.classList.remove('hidden'); el.classList.add('flex'); }
+    else       { el.classList.add('hidden'); el.classList.remove('flex'); }
+  });
+}
+</script>
+
+<!-- Spin & Win Wheel Component -->
+{% include 'components/spinwheel.html' %}

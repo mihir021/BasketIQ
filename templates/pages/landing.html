@@ -1,0 +1,720 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BasketIQ | Your Kitchen Knows What You Need</title>
+<meta name="description" content="BasketIQ is an AI-powered grocery platform that predicts what your kitchen needs before you run out. Smart pricing, smart planning, smarter living."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<style>
+/* ── Reset & Base ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:#0a0a09;color:#F8F5EE;overflow-x:hidden;cursor:none}
+
+/* ── Custom Cursor ────────────────────────────────────────── */
+.cursor{position:fixed;width:12px;height:12px;background:#D4A843;border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s ease,opacity .2s ease;mix-blend-mode:difference}
+.cursor-ring{position:fixed;width:40px;height:40px;border:1.5px solid rgba(212,168,67,.5);border-radius:50%;pointer-events:none;z-index:9998;transition:all .25s ease;transform:translate(-50%,-50%)}
+
+/* ── Loader ───────────────────────────────────────────────── */
+#loader{position:fixed;inset:0;z-index:9000;background:#0a0a09;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity .8s ease,visibility .8s ease}
+#loader.hidden{opacity:0;visibility:hidden}
+.loader-logo{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;color:#F8F5EE;letter-spacing:-.02em;opacity:0;animation:fadeSlideUp .8s .8s ease forwards}
+.loader-sub{font-family:'DM Sans',sans-serif;font-size:.95rem;color:#D4A843;letter-spacing:.15em;text-transform:uppercase;opacity:0;animation:fadeSlideUp .8s 1.2s ease forwards}
+.curtain-left,.curtain-right{position:fixed;top:0;width:50%;height:100%;background:#0a0a09;z-index:8999;transition:transform 1s cubic-bezier(.77,0,.175,1)}
+.curtain-left{left:0;transform:translateX(0)}
+.curtain-right{right:0;transform:translateX(0)}
+.curtain-left.open{transform:translateX(-100%)}
+.curtain-right.open{transform:translateX(100%)}
+
+/* ── SVG Basket Loader ────────────────────────────────────── */
+.basket-svg{width:80px;height:80px;opacity:0;animation:fadeIn .5s .2s ease forwards}
+.basket-path{stroke-dasharray:300;stroke-dashoffset:300;animation:drawStroke 1.2s .3s ease forwards}
+@keyframes drawStroke{to{stroke-dashoffset:0}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Nav ──────────────────────────────────────────────────── */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.25rem 2.5rem;display:flex;align-items:center;justify-content:space-between;transition:all .4s ease}
+#navbar.scrolled{background:rgba(10,10,9,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,67,.15)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#F8F5EE;text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{color:#D4A843}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{color:rgba(248,245,238,.7);text-decoration:none;font-size:.875rem;font-weight:500;letter-spacing:.02em;transition:color .3s}
+.nav-links a:hover{color:#D4A843}
+.nav-cta{background:#D4A843;color:#0a0a09;padding:.55rem 1.5rem;border-radius:100px;font-weight:600;font-size:.875rem;text-decoration:none;transition:all .3s;border:none;cursor:pointer}
+.nav-cta:hover{background:#F8F5EE;transform:scale(1.03)}
+
+/* ── SCENE 1: Hero ────────────────────────────────────────── */
+#scene-hero{position:relative;min-height:100vh;background:#1B4332;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:6rem 2rem 4rem}
+.hero-bg-gradient{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(27,67,50,.8) 0%,#0a0a09 100%);z-index:1}
+.hero-grain{position:absolute;inset:0;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");z-index:2}
+
+/* Floating food illustrations */
+.food-float{position:absolute;z-index:3;will-change:transform;filter:drop-shadow(0 20px 60px rgba(0,0,0,.5))}
+.food-float img{border-radius:50%;object-fit:cover}
+.ff-tomato{width:clamp(80px,10vw,140px);height:clamp(80px,10vw,140px);top:15%;left:8%;animation:floatA 8s ease-in-out infinite}
+.ff-wheat{width:clamp(60px,8vw,110px);height:clamp(60px,8vw,110px);top:25%;right:10%;animation:floatB 10s ease-in-out infinite}
+.ff-ghee{width:clamp(70px,9vw,120px);height:clamp(70px,9vw,120px);bottom:25%;left:12%;animation:floatC 9s ease-in-out infinite}
+.ff-dal{width:clamp(65px,8vw,115px);height:clamp(65px,8vw,115px);bottom:20%;right:8%;animation:floatA 11s ease-in-out infinite}
+.ff-lemon{width:clamp(50px,6vw,90px);height:clamp(50px,6vw,90px);top:50%;left:4%;animation:floatB 7s ease-in-out infinite}
+.ff-spice{width:clamp(55px,7vw,100px);height:clamp(55px,7vw,100px);top:60%;right:5%;animation:floatC 12s ease-in-out infinite}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-30px) rotate(3deg)}}
+@keyframes floatB{0%,100%{transform:translateY(-15px) rotate(5deg)}50%{transform:translateY(15px) rotate(-5deg)}}
+@keyframes floatC{0%,100%{transform:translateY(-10px) rotate(0deg)}33%{transform:translateY(20px) rotate(6deg)}66%{transform:translateY(-5px) rotate(-4deg)}}
+
+.hero-content{position:relative;z-index:10;text-align:center;max-width:900px}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.3);color:#D4A843;font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.4rem 1rem;border-radius:100px;margin-bottom:2rem;opacity:0;animation:fadeSlideUp .8s 2.5s ease forwards}
+.hero-headline{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,7vw,6rem);font-weight:900;line-height:1.08;letter-spacing:-.03em;color:#F8F5EE;margin-bottom:1.5rem}
+.hero-headline .word{display:inline-block;opacity:0;transform:translateY(60px);transition:opacity .7s ease,transform .7s ease}
+.hero-headline .word.visible{opacity:1;transform:translateY(0)}
+.hero-sub{font-size:clamp(1rem,2vw,1.2rem);color:rgba(248,245,238,.6);max-width:540px;margin:0 auto 2.5rem;line-height:1.7;opacity:0;animation:fadeSlideUp .8s 4s ease forwards}
+.hero-cta{opacity:0;animation:fadeSlideUp .8s 4.5s ease forwards}
+.btn-gold{display:inline-flex;align-items:center;gap:.6rem;background:#D4A843;color:#0a0a09;padding:.9rem 2.4rem;border-radius:100px;font-weight:700;font-size:1rem;text-decoration:none;border:none;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.btn-gold::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .3s}
+.btn-gold:hover::after{background:rgba(255,255,255,.15)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 20px 60px rgba(212,168,67,.4)}
+.scroll-cue{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:.5rem;color:rgba(248,245,238,.4);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;opacity:0;animation:fadeSlideUp .8s 5s ease forwards}
+.scroll-dot{width:6px;height:6px;background:#D4A843;border-radius:50%;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+/* ── SCENE 2: The Problem ─────────────────────────────────── */
+#scene-problem{position:relative;background:#F8F5EE;color:#2C2C2A;padding:clamp(4rem,10vw,8rem) 2rem;overflow:hidden;min-height:60vh;display:flex;align-items:center}
+.problem-bg-text{position:absolute;font-family:'Playfair Display',serif;font-size:clamp(3rem,15vw,12rem);font-weight:900;color:rgba(44,44,42,.06);white-space:nowrap;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;letter-spacing:-.05em;z-index:0}
+.problem-content{position:relative;z-index:1;max-width:800px;margin:0 auto;text-align:center}
+.problem-content h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.02em}
+.problem-content p{font-size:clamp(1rem,2vw,1.2rem);color:rgba(44,44,42,.7);line-height:1.8;margin-bottom:3rem}
+.counter-row{display:flex;flex-wrap:wrap;justify-content:center;gap:3rem}
+.counter-item{text-align:center}
+.counter-num{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,6vw,4rem);font-weight:900;color:#1B4332;line-height:1;display:block}
+.counter-label{font-size:.8rem;color:rgba(44,44,42,.5);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem;display:block}
+
+/* ── SCENE 3: AI Magic ────────────────────────────────────── */
+#scene-ai{position:relative;background:#2C2C2A;padding:clamp(4rem,10vw,8rem) 2rem;overflow:hidden;min-height:80vh;display:flex;align-items:center}
+.ai-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(27,67,50,.5) 0%,transparent 70%);pointer-events:none;z-index:0}
+.ai-content{position:relative;z-index:1;max-width:500px;margin:0 auto;width:100%}
+.phone-mockup{background:#111;border-radius:40px;border:2px solid rgba(212,168,67,.2);overflow:hidden;box-shadow:0 60px 120px rgba(0,0,0,.8),0 0 0 8px rgba(212,168,67,.05),inset 0 1px rgba(255,255,255,.1);max-width:380px;margin:0 auto}
+.phone-bar{background:#1a1a1a;padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:.75rem}
+.phone-bar-dot{width:10px;height:10px;border-radius:50%;background:#1B4332}
+.phone-title{font-size:.8rem;color:rgba(255,255,255,.4);font-weight:500}
+.chat-body{padding:1.5rem;display:flex;flex-direction:column;gap:1rem;min-height:320px}
+.chat-bubble{max-width:80%;padding:.75rem 1rem;border-radius:18px;font-size:.875rem;line-height:1.5}
+.chat-ai{background:rgba(27,67,50,.6);color:#F8F5EE;border-radius:18px 18px 18px 4px;border:1px solid rgba(27,67,50,.8)}
+.chat-user{background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.3);color:#D4A843;border-radius:18px 18px 4px 18px;align-self:flex-end}
+.chat-typing{display:flex;gap:.3rem;padding:.75rem 1rem;align-items:center}
+.chat-typing span{width:6px;height:6px;background:rgba(248,245,238,.4);border-radius:50%;animation:typing 1.2s ease-in-out infinite}
+.chat-typing span:nth-child(2){animation-delay:.2s}
+.chat-typing span:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+.ingredient-cards{margin-top:1rem;display:flex;flex-direction:column;gap:.5rem;padding:.5rem 1.5rem 1rem}
+.ing-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.6rem 1rem;display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateX(-20px);transition:all .5s ease}
+.ing-card.visible{opacity:1;transform:translateX(0)}
+.ing-name{font-size:.8rem;color:rgba(248,245,238,.8);font-weight:500}
+.ing-price{font-size:.8rem;font-weight:700;color:#D4A843}
+.total-bar{margin:0 1rem 1.5rem;background:linear-gradient(135deg,#1B4332,#2d6a4f);border-radius:14px;padding:.875rem 1.25rem;display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateY(20px);transition:all .6s ease}
+.total-bar.visible{opacity:1;transform:translateY(0)}
+.total-label{font-size:.75rem;color:rgba(248,245,238,.6);font-weight:500}
+.total-amount{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#D4A843}
+.cart-bounce{display:inline-block;transition:transform .3s cubic-bezier(.36,.07,.19,.97)}
+.cart-bounce.bounce{animation:cartBounce .6s cubic-bezier(.36,.07,.19,.97)}
+@keyframes cartBounce{0%{transform:scale(1)}30%{transform:scale(1.4) rotate(-10deg)}60%{transform:scale(.9) rotate(5deg)}100%{transform:scale(1)}}
+.ai-section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700;color:#F8F5EE;text-align:center;margin-bottom:.75rem}
+.ai-section-sub{text-align:center;color:rgba(248,245,238,.5);font-size:.9rem;margin-bottom:2.5rem;line-height:1.7}
+
+/* ── SCENE 4: Smart Cycle ─────────────────────────────────── */
+#scene-cycle{background:#F8F5EE;padding:clamp(4rem,10vw,8rem) 2rem;overflow:hidden}
+.cycle-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;color:#2C2C2A;text-align:center;margin-bottom:.75rem;letter-spacing:-.02em}
+.cycle-sub{text-align:center;color:rgba(44,44,42,.55);font-size:1rem;margin-bottom:5rem}
+.cycle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:3rem;max-width:1000px;margin:0 auto;position:relative}
+.cycle-step{position:relative;text-align:center}
+.step-num-bg{font-family:'Playfair Display',serif;font-size:clamp(5rem,15vw,10rem);font-weight:900;color:rgba(27,67,50,.06);line-height:1;position:absolute;top:-2rem;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;letter-spacing:-.05em}
+.step-icon{width:72px;height:72px;background:#1B4332;border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;position:relative;z-index:1;font-size:1.75rem;box-shadow:0 20px 60px rgba(27,67,50,.3);transition:transform .4s ease}
+.cycle-step.visible .step-icon{transform:scale(1.05)}
+.step-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;font-weight:700;color:#D4A843;margin-bottom:.5rem;position:relative;z-index:1}
+.step-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#2C2C2A;margin-bottom:.75rem;position:relative;z-index:1}
+.step-desc{font-size:.9rem;color:rgba(44,44,42,.65);line-height:1.7;position:relative;z-index:1}
+
+/* ── SCENE 5: Product Cards ───────────────────────────────── */
+#scene-products{background:#2C2C2A;padding:clamp(4rem,8vw,7rem) 0;overflow:hidden}
+.products-header{padding:0 clamp(1.5rem,5vw,4rem);margin-bottom:3rem}
+.products-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:#F8F5EE;margin-bottom:.5rem}
+.products-sub{color:rgba(248,245,238,.45);font-size:.95rem}
+.products-strip{display:flex;gap:1.25rem;overflow-x:auto;padding:0.5rem clamp(1.5rem,5vw,4rem) 2rem;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none}
+.products-strip::-webkit-scrollbar{display:none}
+.product-card-lp{min-width:220px;max-width:240px;background:#F8F5EE;border-radius:24px;overflow:hidden;scroll-snap-align:start;opacity:0;transform:translateX(60px);transition:all .6s ease;flex-shrink:0}
+.product-card-lp.visible{opacity:1;transform:translateX(0)}
+.product-card-lp:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.product-img{width:100%;height:160px;object-fit:cover;display:block}
+.product-body{padding:1rem 1.1rem 1.25rem}
+.ai-badge{display:inline-flex;align-items:center;gap:.3rem;background:#1B4332;color:#F8F5EE;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:100px;margin-bottom:.6rem}
+.product-name{font-size:.9rem;font-weight:600;color:#2C2C2A;margin-bottom:.25rem;line-height:1.3}
+.product-cat{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(44,44,42,.45);margin-bottom:.75rem}
+.product-price{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:#1B4332}
+
+/* ── SCENE 6: Social Proof ────────────────────────────────── */
+#scene-stats{background:#1B4332;padding:clamp(4rem,10vw,7rem) 2rem}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3rem;max-width:900px;margin:0 auto;text-align:center}
+@media(min-width:700px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-num{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,6vw,4rem);font-weight:900;color:#D4A843;line-height:1;display:block;margin-bottom:.5rem}
+.stat-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(248,245,238,.55);font-weight:500}
+
+/* ── SCENE 7: Emotional Close ─────────────────────────────── */
+#scene-close{background:#F8F5EE;padding:clamp(5rem,12vw,10rem) 2rem;text-align:center;position:relative;overflow:hidden}
+.close-deco{position:absolute;border-radius:50%;pointer-events:none}
+.close-deco-1{width:500px;height:500px;background:radial-gradient(circle,rgba(27,67,50,.07) 0%,transparent 70%);top:-100px;left:-200px}
+.close-deco-2{width:400px;height:400px;background:radial-gradient(circle,rgba(212,168,67,.08) 0%,transparent 70%);bottom:-80px;right:-150px}
+.close-title{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,7vw,5rem);font-weight:900;color:#2C2C2A;line-height:1.1;letter-spacing:-.03em;margin-bottom:1.25rem}
+.close-title em{color:#1B4332;font-style:italic}
+.close-sub{font-size:clamp(1rem,2vw,1.15rem);color:rgba(44,44,42,.6);max-width:480px;margin:0 auto 3rem;line-height:1.7}
+.btn-forest{display:inline-flex;align-items:center;gap:.6rem;background:#1B4332;color:#F8F5EE;padding:1rem 2.8rem;border-radius:100px;font-weight:700;font-size:1.05rem;text-decoration:none;border:none;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.btn-forest:hover{background:#D4A843;color:#0a0a09;transform:translateY(-3px);box-shadow:0 20px 60px rgba(27,67,50,.3)}
+.close-footnote{margin-top:2rem;font-size:.85rem;color:rgba(44,44,42,.45);display:flex;align-items:center;justify-content:center;gap:.4rem}
+.close-footnote span{color:#1B4332}
+
+/* ── Footer ───────────────────────────────────────────────── */
+footer{background:#0a0a09;padding:3.5rem 2rem 2rem;border-top:1px solid rgba(212,168,67,.1)}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:2.5rem}
+@media(min-width:700px){.footer-inner{grid-template-columns:2fr 1fr 1fr 1fr}}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#F8F5EE;margin-bottom:.75rem}
+.footer-logo span{color:#D4A843}
+.footer-desc{font-size:.85rem;color:rgba(248,245,238,.35);line-height:1.7;max-width:240px}
+.footer-col h4{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:#D4A843;font-weight:700;margin-bottom:1rem}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.footer-col ul li a{font-size:.85rem;color:rgba(248,245,238,.45);text-decoration:none;transition:color .3s}
+.footer-col ul li a:hover{color:#F8F5EE}
+.footer-bottom{max-width:1100px;margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center}
+.footer-copy{font-size:.8rem;color:rgba(248,245,238,.25)}
+.social-links{display:flex;gap:1rem}
+.social-links a{width:36px;height:36px;border:1px solid rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(248,245,238,.4);text-decoration:none;font-size:.8rem;transition:all .3s}
+.social-links a:hover{border-color:#D4A843;color:#D4A843}
+
+/* ── Scroll Animations ────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(48px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-48px);transition:opacity .8s ease,transform .8s ease}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(.92);transition:opacity .8s ease,transform .8s ease}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+.delay-1{transition-delay:.1s}.delay-2{transition-delay:.2s}.delay-3{transition-delay:.3s}
+.delay-4{transition-delay:.4s}.delay-5{transition-delay:.5s}.delay-6{transition-delay:.6s}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media(max-width:768px){
+  #navbar{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  .ai-content{padding:0 1rem}
+  .phone-mockup{max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ── Loader / Curtain ── -->
+<div id="loader">
+  <svg class="basket-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path class="basket-path" d="M15 35h50l-8 28H23L15 35Z" stroke="#D4A843" stroke-width="2.5" stroke-linejoin="round"/>
+    <path class="basket-path" d="M10 35h60M28 35 35 15M52 35 45 15M35 15h10" stroke="#D4A843" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="30" cy="67" r="3" fill="#D4A843" opacity=".7"/>
+    <circle cx="50" cy="67" r="3" fill="#D4A843" opacity=".7"/>
+  </svg>
+  <div class="loader-logo">BasketIQ</div>
+  <div class="loader-sub">Your kitchen is thinking…</div>
+</div>
+<div class="curtain-left" id="curtainLeft"></div>
+<div class="curtain-right" id="curtainRight"></div>
+
+<!-- ── Navbar ── -->
+<nav id="navbar">
+  <a class="nav-logo" href="/">Basket<span>IQ</span></a>
+  <div class="nav-links">
+    <a href="#scene-cycle">How it Works</a>
+    <a href="#scene-ai">AI Planner</a>
+    <a href="#scene-stats">Impact</a>
+    <a class="nav-cta" href="{% url 'accounts:login' %}">Start Shopping</a>
+  </div>
+  <a class="nav-cta" href="{% url 'accounts:login' %}" style="display:none" id="mobile-cta">Shop →</a>
+</nav>
+
+<!-- ═══ SCENE 1: HERO ═══════════════════════════════════════ -->
+<section id="scene-hero">
+  <div class="hero-bg-gradient"></div>
+  <div class="hero-grain"></div>
+
+  <!-- Floating Food Illustrations -->
+  <div class="food-float ff-tomato">
+    <img src="https://loremflickr.com/140/140/tomato,red,vegetable?lock=101" alt="Tomato" width="140" height="140" onerror="this.style.display='none'"/>
+  </div>
+  <div class="food-float ff-wheat">
+    <img src="https://loremflickr.com/110/110/wheat,grain,golden?lock=102" alt="Wheat" width="110" height="110" onerror="this.style.display='none'"/>
+  </div>
+  <div class="food-float ff-ghee">
+    <img src="https://loremflickr.com/120/120/butter,golden,dairy?lock=103" alt="Ghee" width="120" height="120" onerror="this.style.display='none'"/>
+  </div>
+  <div class="food-float ff-dal">
+    <img src="https://loremflickr.com/115/115/lentil,dal,yellow?lock=104" alt="Dal" width="115" height="115" onerror="this.style.display='none'"/>
+  </div>
+  <div class="food-float ff-lemon">
+    <img src="https://loremflickr.com/90/90/lemon,citrus,yellow?lock=105" alt="Lemon" width="90" height="90" onerror="this.style.display='none'"/>
+  </div>
+  <div class="food-float ff-spice">
+    <img src="https://loremflickr.com/100/100/spice,colorful,india?lock=106" alt="Spice" width="100" height="100" onerror="this.style.display='none'"/>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">✦ AI-Powered Grocery Intelligence</div>
+    <h1 class="hero-headline" id="heroHeadline">
+      <span class="word">Your</span>
+      <span class="word"> kitchen</span>
+      <span class="word"> knows</span>
+      <span class="word"> what</span>
+      <span class="word"> you</span>
+      <span class="word" style="color:#D4A843;font-style:italic"> need…</span>
+    </h1>
+    <p class="hero-sub">BasketIQ predicts your grocery needs before you run out. AI-driven pricing, personalized planning, and seamless replenishment — all for your kitchen.</p>
+    <div class="hero-cta">
+      <a class="btn-gold" href="{% url 'accounts:login' %}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Start Shopping
+      </a>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <div class="scroll-dot"></div>
+    Scroll to discover
+  </div>
+</section>
+
+<!-- ═══ SCENE 2: THE PROBLEM ════════════════════════════════ -->
+<section id="scene-problem">
+  <div class="problem-bg-text">Forgot onions. Again.</div>
+  <div class="problem-content">
+    <h2 class="reveal">Every household forgets.<br/><em style="color:#1B4332;font-style:italic">Every. Single. Week.</em></h2>
+    <p class="reveal delay-2">The same items. The same last-minute trips. BasketIQ ends the cycle — by predicting what you need before your pantry does.</p>
+    <div class="counter-row">
+      <div class="counter-item reveal delay-2">
+        <span class="counter-num" data-target="12000000" data-suffix="M+" data-display="12">12M+</span>
+        <span class="counter-label">AI Predictions Made</span>
+      </div>
+      <div class="counter-item reveal delay-3">
+        <span class="counter-num" data-target="2400000" data-suffix="M+" data-display="2.4">2.4M+</span>
+        <span class="counter-label">Kitchens Smarter</span>
+      </div>
+      <div class="counter-item reveal delay-4">
+        <span class="counter-num" data-target="180" data-suffix="" data-prefix="₹" data-display="180">₹180</span>
+        <span class="counter-label">Avg. saved per order</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCENE 3: AI MAGIC ════════════════════════════════════ -->
+<section id="scene-ai">
+  <div class="ai-glow"></div>
+  <div style="max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center" class="ai-grid-inner">
+    <div class="reveal-left" style="padding:0 1rem">
+      <p style="font-size:.75rem;text-transform:uppercase;letter-spacing:.15em;color:#D4A843;font-weight:700;margin-bottom:1rem">✦ Scene 3</p>
+      <h2 class="ai-section-title" style="text-align:left">The AI<br/><em style="color:#D4A843;font-style:italic">Magic Moment</em></h2>
+      <p style="color:rgba(248,245,238,.5);font-size:.95rem;line-height:1.8;margin-top:1rem">Just tell us what you're cooking. Our AI lists every ingredient you're missing, finds the best price, and adds them to your cart in seconds.</p>
+      <div style="display:flex;flex-direction:column;gap:.75rem;margin-top:2rem">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <div style="width:36px;height:36px;background:rgba(27,67,50,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🧠</div>
+          <span style="font-size:.875rem;color:rgba(248,245,238,.7)">Understands natural language recipes</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <div style="width:36px;height:36px;background:rgba(27,67,50,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">⚡</div>
+          <span style="font-size:.875rem;color:rgba(248,245,238,.7)">Real-time demand-based pricing</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <div style="width:36px;height:36px;background:rgba(27,67,50,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🛒</div>
+          <span style="font-size:.875rem;color:rgba(248,245,238,.7)">One-tap cart from any recipe</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal" id="aiPhoneSection">
+      <div class="phone-mockup">
+        <div class="phone-bar">
+          <div class="phone-bar-dot"></div>
+          <div class="phone-title">BasketIQ AI Planner</div>
+        </div>
+        <div class="chat-body" id="chatBody">
+          <div class="chat-bubble chat-user" style="opacity:0;transition:opacity .5s" id="chatMsg1">What are we cooking this weekend?</div>
+          <div class="chat-bubble chat-ai" style="opacity:0;transition:opacity .5s;display:none" id="chatMsg2">
+            <span id="typedText"></span><span id="typeCursor" style="opacity:1;animation:blinkCursor 1s infinite">|</span>
+          </div>
+        </div>
+        <div class="ingredient-cards" id="ingredientCards">
+          <div class="ing-card" id="ing1"><span class="ing-name">🫘 Chana Dal  <small style="opacity:.5">1kg</small></span><span class="ing-price">₹120</span></div>
+          <div class="ing-card" id="ing2"><span class="ing-name">🧈 Desi Ghee  <small style="opacity:.5">500ml</small></span><span class="ing-price">₹320</span></div>
+          <div class="ing-card" id="ing3"><span class="ing-name">🍅 Tomatoes  <small style="opacity:.5">1kg</small></span><span class="ing-price">₹35</span></div>
+        </div>
+        <div class="total-bar" id="totalBar">
+          <div><div class="total-label">Total added</div><div class="total-amount">₹<span id="totalCounter">0</span></div></div>
+          <span class="cart-bounce" id="cartIcon">🛒</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCENE 4: SMART CYCLE ════════════════════════════════ -->
+<section id="scene-cycle">
+  <p style="text-align:center;font-size:.75rem;text-transform:uppercase;letter-spacing:.15em;color:#D4A843;font-weight:700;margin-bottom:.75rem">How it works</p>
+  <h2 class="cycle-title reveal">The Smart Cycle</h2>
+  <p class="cycle-sub reveal delay-1">Three steps to a self-stocking kitchen.</p>
+
+  <div class="cycle-grid">
+    <div class="cycle-step reveal delay-1">
+      <div class="step-num-bg">1</div>
+      <div class="step-icon">🔍</div>
+      <div class="step-label">Step One</div>
+      <h3 class="step-title">Browse</h3>
+      <p class="step-desc">Drop your favorite recipes or just tell us what you love. Shop your essentials once to help us learn your taste.</p>
+    </div>
+    <div class="cycle-step reveal delay-3">
+      <div class="step-num-bg">2</div>
+      <div class="step-icon">🧠</div>
+      <div class="step-label">Step Two</div>
+      <h3 class="step-title">AI Thinking</h3>
+      <p class="step-desc">We predict what you'll run out of and when. Our WDS algorithm tracks demand so you always get the best price.</p>
+    </div>
+    <div class="cycle-step reveal delay-5">
+      <div class="step-num-bg">3</div>
+      <div class="step-icon">💚</div>
+      <div class="step-label">Step Three</div>
+      <h3 class="step-title">Save</h3>
+      <p class="step-desc">Auto-replenish before you even notice you're low. Review your pre-filled cart and save big — every single time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCENE 5: PRODUCT CARDS ══════════════════════════════ -->
+<section id="scene-products">
+  <div class="products-header reveal">
+    <p style="font-size:.72rem;text-transform:uppercase;letter-spacing:.15em;color:#D4A843;font-weight:700;margin-bottom:.6rem">✦ Just For You</p>
+    <h2 class="products-title">Right now, just for you.</h2>
+    <p class="products-sub">Based on your recipe history and AI predictions.</p>
+  </div>
+  <div class="products-strip" id="productsStrip">
+    <!-- Cards injected by JS from real DB or use these static fallbacks -->
+    <div class="product-card-lp delay-1">
+      <img class="product-img" src="https://loremflickr.com/240/160/tomato,red,vegetable?lock=201" alt="Tomatoes" onerror="this.src='https://loremflickr.com/240/160/food?lock=999'"/>
+      <div class="product-body">
+        <div class="ai-badge">🤖 AI Predicted</div>
+        <div class="product-name">Hybrid Tomato</div>
+        <div class="product-cat">Vegetables • 1kg</div>
+        <div class="product-price">₹35</div>
+      </div>
+    </div>
+    <div class="product-card-lp delay-2">
+      <img class="product-img" src="https://loremflickr.com/240/160/lentil,yellow,legume?lock=202" alt="Dal" onerror="this.src='https://loremflickr.com/240/160/food?lock=998'"/>
+      <div class="product-body">
+        <div class="ai-badge">🔥 Trending</div>
+        <div class="product-name">Toor Dal</div>
+        <div class="product-cat">Pulses • 1kg</div>
+        <div class="product-price">₹165</div>
+      </div>
+    </div>
+    <div class="product-card-lp delay-3">
+      <img class="product-img" src="https://loremflickr.com/240/160/butter,golden,dairy?lock=203" alt="Ghee" onerror="this.src='https://loremflickr.com/240/160/food?lock=997'"/>
+      <div class="product-body">
+        <div class="ai-badge">🤖 AI Predicted</div>
+        <div class="product-name">Amul Pure Ghee</div>
+        <div class="product-cat">Dairy • 1L</div>
+        <div class="product-price">₹650</div>
+      </div>
+    </div>
+    <div class="product-card-lp delay-4">
+      <img class="product-img" src="https://loremflickr.com/240/160/basmati,rice,grain?lock=204" alt="Rice" onerror="this.src='https://loremflickr.com/240/160/food?lock=996'"/>
+      <div class="product-body">
+        <div class="ai-badge">💸 Deal</div>
+        <div class="product-name">Basmati Rice</div>
+        <div class="product-cat">Grains • 1kg</div>
+        <div class="product-price">₹220</div>
+      </div>
+    </div>
+    <div class="product-card-lp delay-5">
+      <img class="product-img" src="https://loremflickr.com/240/160/spice,colorful,india?lock=205" alt="Spice" onerror="this.src='https://loremflickr.com/240/160/food?lock=995'"/>
+      <div class="product-body">
+        <div class="ai-badge">🤖 AI Predicted</div>
+        <div class="product-name">Everest Garam Masala</div>
+        <div class="product-cat">Spices • 100g</div>
+        <div class="product-price">₹90</div>
+      </div>
+    </div>
+    <div class="product-card-lp delay-6">
+      <img class="product-img" src="https://loremflickr.com/240/160/apple,red,fruit?lock=206" alt="Apple" onerror="this.src='https://loremflickr.com/240/160/food?lock=994'"/>
+      <div class="product-body">
+        <div class="ai-badge">📈 Rising</div>
+        <div class="product-name">Shimla Apple</div>
+        <div class="product-cat">Fruits • 1kg</div>
+        <div class="product-price">₹200</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCENE 6: SOCIAL PROOF ═══════════════════════════════ -->
+<section id="scene-stats">
+  <p style="text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(212,168,67,.6);font-weight:700;margin-bottom:3rem" class="reveal">Numbers that matter</p>
+  <div class="stats-grid">
+    <div class="reveal delay-1">
+      <span class="stat-num" data-count="2.4" data-suffix="M+">0</span>
+      <span class="stat-label">Deliveries</span>
+    </div>
+    <div class="reveal delay-2">
+      <span class="stat-num" data-count="180" data-prefix="₹" data-suffix="">0</span>
+      <span class="stat-label">Avg Saved / Order</span>
+    </div>
+    <div class="reveal delay-3">
+      <span class="stat-num" data-count="12" data-suffix="M">0</span>
+      <span class="stat-label">AI Predictions</span>
+    </div>
+    <div class="reveal delay-4">
+      <span class="stat-num" data-count="4.9" data-suffix="/5">0</span>
+      <span class="stat-label">User Rating</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCENE 7: EMOTIONAL CLOSE ════════════════════════════ -->
+<section id="scene-close">
+  <div class="close-deco close-deco-1"></div>
+  <div class="close-deco close-deco-2"></div>
+  <div style="position:relative;z-index:1;max-width:680px;margin:0 auto">
+    <p style="font-size:.72rem;text-transform:uppercase;letter-spacing:.15em;color:#1B4332;font-weight:700;margin-bottom:1.5rem" class="reveal">✦ Begin your journey</p>
+    <h2 class="close-title reveal delay-1">Ready for a<br/><em>smarter kitchen?</em></h2>
+    <p class="close-sub reveal delay-2">Join 2.4M+ users who never worry about grocery shopping anymore. Let AI do the thinking — you do the cooking.</p>
+    <div class="reveal delay-3">
+      <a class="btn-forest" href="{% url 'accounts:login' %}">
+        Get Started Now
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="close-footnote reveal delay-4">
+      <span>🎁</span>
+      <span>Free delivery on your first</span>
+      <span style="color:#1B4332;font-weight:700">3 orders</span>
+      <span>— no code needed.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Basket<span>IQ</span></div>
+      <p class="footer-desc">The smart assistant that manages your kitchen. Personalized pricing, predicted needs, and perfect freshness.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="{% url 'market:index' %}">Market</a></li>
+        <li><a href="{% url 'planner:ai_grocery_planner' %}">AI Planner</a></li>
+        <li><a href="{% url 'orders:my_order' %}">My Orders</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <ul>
+        <li><a href="{% url 'accounts:login' %}">Log In</a></li>
+        <li><a href="{% url 'accounts:signup' %}">Sign Up</a></li>
+        <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 BasketIQ. Freshly picked for your kitchen.</p>
+    <div class="social-links">
+      <a href="#" title="Twitter">𝕏</a>
+      <a href="#" title="Instagram">IG</a>
+      <a href="#" title="LinkedIn">in</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+@keyframes blinkCursor{0%,100%{opacity:1}50%{opacity:0}}
+@media(max-width:768px){
+  .ai-grid-inner{grid-template-columns:1fr!important}
+  .ai-grid-inner > div:first-child{display:none}
+}
+</style>
+
+<script>
+// ── Custom Cursor ──────────────────────────────────────────────────────────
+const cursor     = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.transform=`translate(${mx-6}px,${my-6}px)`;
+});
+(function animateRing(){
+  rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+  cursorRing.style.left=rx+'px'; cursorRing.style.top=ry+'px';
+  requestAnimationFrame(animateRing);
+})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursorRing.style.transform='translate(-50%,-50%) scale(1.6)';cursorRing.style.borderColor='rgba(212,168,67,.8)'});
+  el.addEventListener('mouseleave',()=>{cursorRing.style.transform='translate(-50%,-50%) scale(1)';cursorRing.style.borderColor='rgba(212,168,67,.5)'});
+});
+
+// ── Loader & Curtain Reveal ────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('curtainLeft').classList.add('open');
+    document.getElementById('curtainRight').classList.add('open');
+    // Start hero word animation
+    setTimeout(startHeroAnimation, 800);
+  }, 2200);
+});
+
+// ── Hero Word-by-Word Animation ───────────────────────────────────────────
+function startHeroAnimation(){
+  const words = document.querySelectorAll('#heroHeadline .word');
+  words.forEach((w,i)=>{
+    setTimeout(()=>{ w.classList.add('visible'); }, i * 180);
+  });
+}
+
+// ── Navbar Scroll Effect ───────────────────────────────────────────────────
+const navbar = document.getElementById('navbar');
+const mobileCta = document.getElementById('mobile-cta');
+window.addEventListener('scroll',()=>{
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+});
+if(window.innerWidth <= 768) mobileCta.style.display='inline-flex';
+
+// ── Parallax on Hero Food Floats ──────────────────────────────────────────
+const floats = document.querySelectorAll('.food-float');
+window.addEventListener('scroll',()=>{
+  const sy = window.scrollY;
+  floats.forEach((el,i)=>{
+    const speed = [0.15,0.2,0.12,0.18,0.22,0.16][i] || 0.15;
+    el.style.transform = `translateY(${sy * speed}px)`;
+  });
+});
+
+// ── IntersectionObserver for all .reveal elements ─────────────────────────
+const revealObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('visible'); }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-scale').forEach(el=>revealObs.observe(el));
+
+// ── Counter Animation (Problem scene) ────────────────────────────────────
+const counterObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    const el = e.target;
+    if(el.dataset.animated) return;
+    el.dataset.animated = '1';
+    const target  = parseFloat(el.dataset.count);
+    const prefix  = el.dataset.prefix  || '';
+    const suffix  = el.dataset.suffix  || '';
+    const isFloat = target % 1 !== 0;
+    let current = 0;
+    const duration = 1800, step = 16;
+    const inc = target / (duration / step);
+    const timer = setInterval(()=>{
+      current = Math.min(current + inc, target);
+      el.textContent = prefix + (isFloat ? current.toFixed(1) : Math.floor(current)) + suffix;
+      if(current >= target) clearInterval(timer);
+    }, step);
+  });
+},{threshold:0.4});
+document.querySelectorAll('.stat-num').forEach(el=>counterObs.observe(el));
+
+// ── AI Scene: Typewriter Sequence ─────────────────────────────────────────
+let aiStarted = false;
+const aiObs = new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting && !aiStarted){
+    aiStarted = true;
+    startAISequence();
+  }
+},{threshold:0.3});
+const aiSection = document.getElementById('aiPhoneSection');
+if(aiSection) aiObs.observe(aiSection);
+
+function startAISequence(){
+  const msg1    = document.getElementById('chatMsg1');
+  const msg2    = document.getElementById('chatMsg2');
+  const typed   = document.getElementById('typedText');
+  const tc      = document.getElementById('typeCursor');
+  const ing1    = document.getElementById('ing1');
+  const ing2    = document.getElementById('ing2');
+  const ing3    = document.getElementById('ing3');
+  const totalBar= document.getElementById('totalBar');
+  const totalC  = document.getElementById('totalCounter');
+  const cartIcon= document.getElementById('cartIcon');
+
+  // Step 1: show user message
+  setTimeout(()=>{ msg1.style.opacity='1'; }, 400);
+
+  // Step 2: show AI typing indicator, then typewrite
+  const aiResponse = "Dal Makhani for 4 🍛 Here's what you're missing from your pantry…";
+  setTimeout(()=>{
+    msg2.style.display='block';
+    setTimeout(()=>{ msg2.style.opacity='1'; },50);
+    let i=0;
+    const tw = setInterval(()=>{
+      typed.textContent = aiResponse.slice(0,i++);
+      if(i > aiResponse.length){ clearInterval(tw); tc.style.display='none'; }
+    }, 38);
+  }, 1200);
+
+  // Step 3: reveal ingredients one by one
+  [[ing1,800],[ing2,1200],[ing3,1600]].forEach(([el,delay])=>{
+    setTimeout(()=>{ el.classList.add('visible'); }, 2800 + delay);
+  });
+
+  // Step 4: total bar + cart bounce
+  setTimeout(()=>{
+    totalBar.classList.add('visible');
+    let total = 0, target = 475;
+    const inc = setInterval(()=>{
+      total = Math.min(total + 15, target);
+      totalC.textContent = total;
+      if(total >= target){ clearInterval(inc); }
+    }, 25);
+    // Cart bounce
+    setTimeout(()=>{
+      cartIcon.classList.add('bounce');
+      setTimeout(()=>cartIcon.classList.remove('bounce'), 700);
+    }, 600);
+  }, 5200);
+}
+
+// ── Product Cards Strip: stagger reveal ───────────────────────────────────
+const cardObs = new IntersectionObserver(entries=>{
+  if(!entries[0].isIntersecting) return;
+  document.querySelectorAll('.product-card-lp').forEach((c,i)=>{
+    setTimeout(()=>c.classList.add('visible'), i * 100);
+  });
+  cardObs.disconnect();
+},{threshold:0.1});
+const strip = document.getElementById('productsStrip');
+if(strip) cardObs.observe(strip);
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0 48px;
+  color: rgba(44, 44, 42, 0.7);
+}
+
+.product-card,
+.expense-row {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+}

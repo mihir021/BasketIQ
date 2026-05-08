@@ -1,0 +1,30 @@
+:root {
+  --forest: #1b4332;
+  --cream: #f8f5ee;
+  --gold: #d4a843;
+  --ink: #2c2c2a;
+  --border: #e8e4dc;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "DM Sans", sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.site-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}

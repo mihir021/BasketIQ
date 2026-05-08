@@ -1,0 +1,1 @@
+window.BasketIQProfile = window.BasketIQProfile || {};

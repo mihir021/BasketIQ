@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}BasketIQ{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% include "components/navbar.html" %}
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  {% include "components/footer.html" %}
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/animations.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Shimla Apple",
+        "category": "Fruits",
+        "price": 180,
+        "discount": 10,
+        "is_best_seller": true,
+        "image_url": "https://example.com/apple.jpg"
+    },
+    {
+        "name": "Full Cream Milk",
+        "category": "Dairy",
+        "price": 66,
+        "discount": 0,
+        "is_best_seller": false,
+        "image_url": "https://example.com/milk.jpg"
+    }
+]

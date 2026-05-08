@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GroceryPulse Admin Operations</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/layout.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+  <link rel="stylesheet" href="/static/css/admin.css">
+  <link rel="stylesheet" href="/static/css/admin-premium.css">
+  <script type="module" src="/static/js/adminOperationsPage.js" defer></script>
+</head>
+<body class="admin-body">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div>
+        <p class="brand-kicker">Fresh Ops</p>
+        <h1>GroceryPulse</h1>
+        <p class="sidebar-copy">Store execution, stock watchlists, and order-lane monitoring for daily grocery operations.</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="./admin.html">Overview</a>
+        <a class="is-active" href="./admin-operations.html">Operations</a>
+        <a href="./admin-insights.html">Insights</a>
+      </nav>
+      <div class="sidebar-footer">
+        <span>Reorder Risk</span>
+        <span>Top Movers</span>
+        <span>Order Lane</span>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <p class="eyebrow">Operations desk</p>
+          <h2 class="page-title">Inventory and order execution</h2>
+          <p class="page-copy">A sharper view of what needs replenishment, what is moving fastest, and which order states are building pressure.</p>
+        </div>
+        <div class="topbar-meta">
+          <span class="user-pill" data-admin-name>Guest</span>
+          <button class="ghost-button" data-logout>Logout</button>
+        </div>
+      </header>
+
+      <section class="login-panel login-surface" id="login-panel">
+        <div>
+          <p class="eyebrow">Admin sign in</p>
+          <h3>Continue to the operations desk</h3>
+          <p>Your saved admin session will automatically unlock this page after the first login.</p>
+        </div>
+        <form id="login-form" class="login-form">
+          <label>Email<input type="email" name="email" required></label>
+          <label>Password<input type="password" name="password" required></label>
+          <button type="submit">Sign In</button>
+          <p id="login-feedback" class="feedback-text"></p>
+        </form>
+      </section>
+
+      <section class="hero-panel hidden" data-page-panel>
+        <div>
+          <p class="eyebrow">Field operations</p>
+          <h3>Work the shelf, not the guesswork.</h3>
+          <p class="hero-copy">Low-stock items, velocity leaders, and live order lanes arranged for daily admin action.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="filter-chip is-active" data-range="7d">7 days</button>
+          <button class="filter-chip" data-range="30d">30 days</button>
+          <button class="filter-chip" data-range="90d">90 days</button>
+        </div>
+      </section>
+
+      <section class="page-grid-three hidden" data-page-panel>
+        <article class="chart-card"><div class="card-header"><div><p class="eyebrow">Reorder watch</p><h3>Inventory watchlist</h3></div></div><div id="inventory-watch" class="table-stack"></div></article>
+        <article class="chart-card"><div class="card-header"><div><p class="eyebrow">Top movers</p><h3>Fastest grocery products</h3></div></div><div id="top-movers" class="metric-stack"></div></article>
+        <article class="chart-card"><div class="card-header"><div><p class="eyebrow">Order lane</p><h3>Recent order flow</h3></div></div><div id="order-lane" class="table-stack"></div></article>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

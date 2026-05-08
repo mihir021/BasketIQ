@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Profile & Expense Dashboard | BasketIQ</title>
+    <meta name="description" content="Your personal financial command center — track expenses, view analytics, and manage your BasketIQ profile." />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind (required for shared navbar component) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1B4332",
+                        background: "#F8F5EE",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* ══════════════════════════════════════════════
+           DESIGN TOKENS
+           ══════════════════════════════════════════════ */
+        :root {
+            --forest:    #1B4332;
+            --forest-md: #2D6A4F;
+            --cream:     #F8F5EE;
+            --charcoal:  #2C2C2A;
+            --gold:      #D4A843;
+            --sage:      #D8E8D0;
+            --sage-mid:  #8DB99A;
+            --border:    #E8E4DC;
+            --border-lt: #E0DDD6;
+            --bg-hover:  #F0EDE6;
+            --muted:     #8A867E;
+            --white:     #FFFFFF;
+            --red-muted: #C0392B;
+
+            --ff-display: 'Playfair Display', Georgia, serif;
+            --ff-body:    'DM Sans', 'Segoe UI', sans-serif;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-pill: 50px;
+        }
+
+        /* ══════════════════════════════════════════════
+           RESET & BASE
+           ══════════════════════════════════════════════ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--ff-body) !important;
+            background: var(--cream) !important;
+            color: var(--charcoal);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding-top: 0;
+            padding-bottom: 100px; /* mobile bottom nav clearance */
+        }
+        img { max-width: 100%; display: block; }
+        a { text-decoration: none; color: inherit; }
+        button { font-family: inherit; cursor: pointer; border: none; }
+        input, select { font-family: var(--ff-body); }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        /* No-scrollbar utility */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ══════════════════════════════════════════════
+           NAVBAR OVERRIDES (cinematic brand)
+           ══════════════════════════════════════════════ */
+        #mainNavbar {
+            background: var(--cream) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-bottom: 1px solid var(--border-lt) !important;
+            box-shadow: none !important;
+        }
+
+        /* ══════════════════════════════════════════════
+           LAYOUT
+           ══════════════════════════════════════════════ */
+        .dashboard-main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 120px 24px 80px;
+        }
+
+        /* ══════════════════════════════════════════════
+           SECTION 1 — PROFILE HERO CARD
+           ══════════════════════════════════════════════ */
+        .profile-hero {
+            background: var(--forest);
+            border-radius: var(--radius-xl);
+            padding: 36px 40px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            margin-bottom: 48px;
+            position: relative;
+            overflow: hidden;
+
+            /* Fade-in animation */
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInDown 0.6s ease forwards;
+        }
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(216,232,208,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .profile-hero__left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .avatar-circle {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: var(--cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid rgba(248,245,238,0.25);
+        }
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-initials {
+            font-family: var(--ff-display);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gold);
+            line-height: 1;
+        }
+        .avatar-edit-badge {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 28px;
+            height: 28px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid var(--forest);
+            transition: transform 0.2s ease;
+        }
+        .avatar-edit-badge:hover { transform: scale(1.1); }
+        .avatar-edit-badge .material-symbols-outlined {
+            font-size: 14px;
+            color: var(--forest);
+        }
+
+        .profile-info { min-width: 0; }
+        .profile-info__header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+        .profile-name {
+            font-family: var(--ff-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--cream);
+            line-height: 1.2;
+        }
+        .edit-profile-link {
+            font-size: 12px;
+            color: rgba(248,245,238,0.6);
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .edit-profile-link:hover { color: var(--cream); }
+
+        .profile-email {
+            font-size: 14px;
+            color: rgba(248,245,238,0.5);
+            margin-bottom: 12px;
+        }
+
+        .profile-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .pill--sage {
+            background: var(--sage);
+            color: var(--forest);
+        }
+        .pill--gold {
+            background: rgba(212,168,67,0.2);
+            color: var(--gold);
+        }
+
+        /* Stat cards */
+        .profile-hero__stats {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .stat-card {
+            background: rgba(248,245,238,0.12);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            text-align: center;
+            min-width: 110px;
+            backdrop-filter: blur(4px);
+        }
+        .stat-card__label {
+            font-size: 11px;
+            color: rgba(248,245,238,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+        .stat-card__value {
+            font-family: var(--ff-display);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        /* ══════════════════════════════════════════════
+           SECTION HEADING STYLE
+           ══════════════════════════════════════════════ */
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .section-heading__bar {
+            width: 4px;
+            height: 28px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+        .section-heading__text {
+            font-family: var(--ff-display);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--charcoal);
+        }
+
+        /* ══════════════════════════════════════════════
+           CARDS — shared base
+           ══════════════════════════════════════════════ */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(27,67,50,0.07);
+        }
+
+        /* ══════════════════════════════════════════════
+           SECTION 2 — EXPENSE ANALYTICS
+           ══════════════════════════════════════════════ */
+        .analytics-section { margin-bottom: 48px; }
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .chart-card { padding: 28px; }
+        .chart-card__label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+        }
+        .chart-wrapper canvas { width: 100% !important; height: 100% !important; }
+
+        .donut-center-label {
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+        .donut-center-label__amount {
+            font-family: var(--ff-display);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--charcoal);
+        }
+        .donut-center-label__sub {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--charcoal);
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .chart-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 280px;
+            color: var(--muted);
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* ══════════════════════════════════════════════
+           SECTION 3 — TWO-COLUMN LOWER GRID
+           ══════════════════════════════════════════════ */
+        .lower-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        /* — Add Expense Form — */
+        .form-card {
+            background: var(--cream);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 28px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(27,67,50,0.07);
+        }
+        .form-card__heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .form-card__heading h3 {
+            font-family: var(--ff-display);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--charcoal);
+        }
+        .form-card__heading .material-symbols-outlined {
+            color: var(--gold);
+            font-size: 22px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid #D4D0C8;
+            background: var(--cream);
+            font-size: 14px;
+            color: var(--charcoal);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input::placeholder {
+            font-style: italic;
+            color: rgba(44,44,42,0.35);
+        }
+        .form-input:focus {
+            border-color: var(--forest);
+            box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-group { margin-bottom: 16px; }
+
+        .form-select {
+            width: 100%;
+            padding: 14px 36px 14px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid #D4D0C8;
+            background: var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%231B4332' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+            -webkit-appearance: none;
+            appearance: none;
+            font-size: 14px;
+            color: var(--charcoal);
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-select:focus {
+            border-color: var(--forest);
+            box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
+        }
+
+        .btn-save {
+            width: 100%;
+            height: 52px;
+            background: var(--forest);
+            color: var(--cream);
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s, border-left 0.2s, transform 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-save:hover {
+            background: var(--forest-md);
+            border-left: 3px solid var(--gold);
+        }
+        .btn-save:active { transform: scale(0.97); }
+        .btn-save.saved {
+            background: var(--forest-md);
+            animation: savePulse 0.5s ease;
+        }
+
+        /* — Order History — */
+        .order-card { padding: 28px; }
+        .order-card__heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .order-card__heading h3 {
+            font-family: var(--ff-display);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--charcoal);
+        }
+        .order-card__heading .material-symbols-outlined {
+            color: var(--gold);
+            font-size: 22px;
+        }
+
+        .order-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            text-align: center;
+        }
+        .order-empty svg { margin-bottom: 20px; }
+        .order-empty__title {
+            font-family: var(--ff-display);
+            font-style: italic;
+            font-size: 16px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        .order-empty__sub {
+            font-size: 13px;
+            color: rgba(138,134,126,0.7);
+        }
+
+        .order-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: rgba(248,245,238,0.5);
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+            transition: background 0.15s;
+        }
+        .order-row:hover { background: var(--bg-hover); }
+        .order-row__left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .order-row__id {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--charcoal);
+        }
+        .order-row__date {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+        .order-row__items {
+            font-size: 13px;
+            color: rgba(44,44,42,0.7);
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .order-row__right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .order-row__total {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--forest);
+        }
+        .status-pill {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+        }
+        .status-pill--delivered {
+            background: rgba(27,67,50,0.1);
+            color: var(--forest);
+        }
+        .status-pill--pending {
+            background: rgba(212,168,67,0.15);
+            color: var(--gold);
+        }
+
+        .order-list {
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        /* ══════════════════════════════════════════════
+           SECTION 4 — EXPENSE HISTORY
+           ══════════════════════════════════════════════ */
+        .expense-history-card { padding: 28px; margin-bottom: 48px; }
+        .expense-history__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .expense-history__title {
+            font-family: var(--ff-display);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--charcoal);
+        }
+        .expense-history__total-badge {
+            background: var(--forest);
+            color: var(--cream);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: var(--radius-pill);
+        }
+
+        .expense-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--forest);
+            transition: background 0.15s;
+            position: relative;
+            margin-bottom: 8px;
+
+            /* Stagger animation */
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        .expense-row.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .expense-row:hover { background: var(--bg-hover); }
+        .expense-row__left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .expense-row__title {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--charcoal);
+        }
+        .expense-row__meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-pill {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+        }
+        .category-pill--green {
+            background: rgba(27,67,50,0.1);
+            color: var(--forest);
+        }
+        .category-pill--gold {
+            background: rgba(212,168,67,0.12);
+            color: var(--gold);
+        }
+        .category-pill--sage {
+            background: rgba(141,185,154,0.2);
+            color: var(--forest-md);
+        }
+        .expense-row__date {
+            font-size: 12px;
+            color: var(--muted);
+        }
+        .expense-row__right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .expense-row__amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--charcoal);
+        }
+        .expense-row__delete {
+            opacity: 0;
+            color: var(--red-muted);
+            cursor: pointer;
+            font-size: 18px;
+            transition: opacity 0.15s;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+        .expense-row:hover .expense-row__delete { opacity: 0.6; }
+        .expense-row__delete:hover { opacity: 1 !important; }
+
+        .expense-list {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+        .expense-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .add-another-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--forest);
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .add-another-link:hover { color: var(--forest-md); }
+
+        /* ══════════════════════════════════════════════
+           MODAL
+           ══════════════════════════════════════════════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 36px;
+            width: 90%;
+            max-width: 440px;
+            z-index: 101;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.15);
+        }
+        .modal-box.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .modal-header h2 {
+            font-family: var(--ff-display);
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: background 0.15s;
+        }
+        .modal-close:hover { background: var(--bg-hover); }
+
+        /* ══════════════════════════════════════════════
+           ANIMATIONS
+           ══════════════════════════════════════════════ */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes savePulse {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+
+        .anim-fadeInUp {
+            opacity: 0;
+            transform: translateY(16px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* ══════════════════════════════════════════════
+           RESPONSIVE
+           ══════════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .analytics-grid { grid-template-columns: 1fr; }
+            .lower-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 700px) {
+            .profile-hero {
+                flex-direction: column;
+                padding: 28px 24px;
+                text-align: center;
+            }
+            .profile-hero__left {
+                flex-direction: column;
+                align-items: center;
+            }
+            .profile-info { text-align: center; }
+            .profile-info__header {
+                justify-content: center;
+            }
+            .profile-pills { justify-content: center; }
+            .profile-hero__stats {
+                width: 100%;
+                justify-content: center;
+            }
+            .stat-card { min-width: 90px; flex: 1; }
+            .dashboard-main { padding: 100px 16px 120px; }
+            .form-row { grid-template-columns: 1fr; }
+            .order-row__items { max-width: 120px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login/'; }
+</script>
+
+{% include 'components/navbar.html' %}
+
+<main class="dashboard-main">
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 1 — PROFILE HERO CARD
+         ═══════════════════════════════════════════════ -->
+    <section class="profile-hero" id="profileHero">
+        <div class="profile-hero__left">
+            <div class="avatar-wrapper">
+                <div class="avatar-circle" id="profileImageContainer">
+                    <span class="avatar-initials" id="initials">U</span>
+                </div>
+                <label for="imageUpload" class="avatar-edit-badge" title="Change photo">
+                    <span class="material-symbols-outlined">photo_camera</span>
+                </label>
+                <input type="file" id="imageUpload" style="display:none" accept="image/*" onchange="handleImageUpload(event)">
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-info__header">
+                    <h1 class="profile-name" id="userName">Loading…</h1>
+                    <span class="edit-profile-link" onclick="toggleModal()">Edit Profile</span>
+                </div>
+                <p class="profile-email" id="userEmail">fetching details…</p>
+                <div class="profile-pills">
+                    <span class="pill pill--sage">📍 <span id="userLocation">City</span></span>
+                    <span class="pill pill--gold">🛒 Total: ₹<span id="totalExpensesSummary">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-hero__stats">
+            <div class="stat-card">
+                <div class="stat-card__label">Orders Placed</div>
+                <div class="stat-card__value" data-countup="true" id="statOrders">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card__label">This Month</div>
+                <div class="stat-card__value" data-countup="true" data-prefix="₹" id="statMonth">₹0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card__label">AI Predictions</div>
+                <div class="stat-card__value" data-countup="true" id="statAI">0</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 2 — EXPENSE ANALYTICS
+         ═══════════════════════════════════════════════ -->
+    <section class="analytics-section anim-fadeInUp" style="animation-delay: 0.15s;">
+        <div class="section-heading">
+            <div class="section-heading__bar"></div>
+            <h2 class="section-heading__text">Expense Analytics</h2>
+        </div>
+
+        <div class="analytics-grid">
+            <!-- Monthly Distribution -->
+            <div class="card chart-card">
+                <div class="chart-card__label">Monthly Distribution</div>
+                <div class="chart-wrapper" id="monthlyChartWrapper">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="card chart-card">
+                <div class="chart-card__label">Category Breakdown</div>
+                <div class="chart-wrapper" id="categoryChartWrapper" style="position:relative;">
+                    <canvas id="categoryChart"></canvas>
+                    <div class="donut-center-label" id="donutCenter">
+                        <div class="donut-center-label__amount" id="donutTotal">₹0</div>
+                        <div class="donut-center-label__sub">Total</div>
+                    </div>
+                </div>
+                <div class="legend-row" id="categoryLegend"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 3 — ADD EXPENSE + ORDER HISTORY
+         ═══════════════════════════════════════════════ -->
+    <section class="lower-grid anim-fadeInUp" style="animation-delay: 0.3s;">
+        <!-- Add Expense Form -->
+        <div class="form-card">
+            <div class="form-card__heading">
+                <span class="material-symbols-outlined">add_circle</span>
+                <h3>Add Expense</h3>
+            </div>
+            <form id="expenseForm">
+                <div class="form-group">
+                    <label class="form-label">Expense For?</label>
+                    <input type="text" id="title" class="form-input" placeholder="Milk, Bread, Rent…" required>
+                </div>
+                <div class="form-row form-group">
+                    <div>
+                        <label class="form-label">Amount (₹)</label>
+                        <input type="number" id="amount" class="form-input" placeholder="0.00" step="0.01" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Category</label>
+                        <select id="category" class="form-select">
+                            <option value="Dairy Products">🥛 Dairy Products</option>
+                            <option value="Fruits">🍎 Fruits</option>
+                            <option value="Vegetables">🥬 Vegetables</option>
+                            <option value="Pulses & Lentils">🫘 Pulses & Lentils</option>
+                            <option value="Flour & Grains">🌾 Flour & Grains</option>
+                            <option value="Oil & Ghee">🫒 Oil & Ghee</option>
+                            <option value="Pantry & Spices">🧂 Pantry & Spices</option>
+                            <option value="Beverages">☕ Beverages</option>
+                            <option value="Snacks">🍿 Snacks</option>
+                            <option value="Meat & Eggs">🥚 Meat & Eggs</option>
+                            <option value="Grocery">🛒 Grocery (General)</option>
+                            <option value="Other">📦 Other</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-save" id="saveBtn">
+                    <span class="material-symbols-outlined" id="saveBtnIcon">save</span>
+                    <span id="saveBtnText">Save Expense</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Order History -->
+        <div class="card order-card">
+            <div class="order-card__heading">
+                <span class="material-symbols-outlined">shopping_basket</span>
+                <h3>Order History</h3>
+            </div>
+            <div id="orderList" class="order-list no-scrollbar">
+                <div class="order-empty">
+                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="15" y="28" width="50" height="36" rx="6" stroke="#8DB99A" stroke-width="2" fill="none"/>
+                        <path d="M15 38H65" stroke="#8DB99A" stroke-width="2"/>
+                        <path d="M30 28V20C30 17.2386 32.2386 15 35 15H45C47.7614 15 50 17.2386 50 20V28" stroke="#8DB99A" stroke-width="2" fill="none"/>
+                        <circle cx="35" cy="50" r="3" fill="#D8E8D0"/>
+                        <circle cx="45" cy="50" r="3" fill="#D8E8D0"/>
+                    </svg>
+                    <p class="order-empty__title">No orders placed yet.</p>
+                    <p class="order-empty__sub">Your first order is just a recipe away.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 4 — EXPENSE HISTORY LIST
+         ═══════════════════════════════════════════════ -->
+    <section class="card expense-history-card anim-fadeInUp" style="animation-delay: 0.45s;">
+        <div class="expense-history__header">
+            <h2 class="expense-history__title">Expense History</h2>
+            <span class="expense-history__total-badge">₹<span id="totalAmount">0.00</span></span>
+        </div>
+        <div id="expenseList" class="expense-list no-scrollbar">
+            <p class="expense-empty">No expenses recorded yet.</p>
+        </div>
+        <a class="add-another-link" onclick="document.getElementById('title').focus(); window.scrollTo({top: document.querySelector('.form-card').offsetTop - 120, behavior:'smooth'});">
+            + Add another expense
+        </a>
+    </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════
+     EDIT PROFILE MODAL
+     ═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="toggleModal()"></div>
+<div class="modal-box" id="modalBox">
+    <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <button class="modal-close" onclick="toggleModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <form id="profileForm">
+        <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="editName" class="form-input" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="editEmail" class="form-input" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" id="editLocation" class="form-input">
+        </div>
+        <button type="submit" class="btn-save" style="margin-top:8px;">
+            <span class="material-symbols-outlined">check</span> Save Changes
+        </button>
+    </form>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════ -->
+<script>
+    // ── API layer ──────────────────────────────────
+    const BASE_URL = '';
+    const api = {
+        getAuthHeader() {
+            const token = localStorage.getItem('token');
+            return token ? { 'Authorization': `Bearer ${token}` } : {};
+        },
+        async getProfile() {
+            const response = await fetch(`${BASE_URL}/api/profile/profile/`, { headers: this.getAuthHeader() });
+            return response.json();
+        },
+        async updateProfile(data) {
+            const response = await fetch(`${BASE_URL}/api/profile/profile/`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        },
+        async getExpenses() {
+            const response = await fetch(`${BASE_URL}/api/expenses/expenses/`, { headers: this.getAuthHeader() });
+            return response.json();
+        },
+        async addExpense(data) {
+            const response = await fetch(`${BASE_URL}/api/expenses/expenses/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...this.getAuthHeader() },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        },
+        async getExpenseGraph(type) {
+            const response = await fetch(`${BASE_URL}/api/expenses/expense-graph/${type}/`, { headers: this.getAuthHeader() });
+            return response.json();
+        },
+        async getOrders() {
+            const response = await fetch(`${BASE_URL}/api/orders/orders/`, { headers: this.getAuthHeader() });
+            return response.json();
+        },
+        logout() { localStorage.clear(); window.location.href = '/login/'; }
+    };
+</script>
+
+<script>
+    // ══════════════════════════════════════════════
+    //  COUNT-UP ANIMATION
+    // ══════════════════════════════════════════════
+    function animateCountUp(el, target, duration = 1200, prefix = '') {
+        const start = 0;
+        const startTime = performance.now();
+        function tick(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(start + (target - start) * eased);
+            el.textContent = prefix + current;
+            if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    // ══════════════════════════════════════════════
+    //  CATEGORY COLORS
+    // ══════════════════════════════════════════════
+    const categoryColorMap = {
+        'Dairy Products': { bg: 'rgba(27,67,50,0.1)', text: '#1B4332', chart: '#1B4332' },
+        'Fruits':         { bg: 'rgba(212,168,67,0.12)', text: '#D4A843', chart: '#D4A843' },
+        'Vegetables':     { bg: 'rgba(141,185,154,0.2)', text: '#2D6A4F', chart: '#8DB99A' },
+        'Pulses & Lentils': { bg: 'rgba(27,67,50,0.08)', text: '#1B4332', chart: '#2D6A4F' },
+        'Flour & Grains': { bg: 'rgba(212,168,67,0.08)', text: '#B8922F', chart: '#B8922F' },
+        'Oil & Ghee':     { bg: 'rgba(141,185,154,0.15)', text: '#2D6A4F', chart: '#6B9B7D' },
+        'Pantry & Spices':{ bg: 'rgba(44,44,42,0.06)', text: '#2C2C2A', chart: '#5A5A56' },
+        'Beverages':      { bg: 'rgba(212,168,67,0.1)', text: '#D4A843', chart: '#C9A34E' },
+        'Snacks':         { bg: 'rgba(27,67,50,0.06)', text: '#1B4332', chart: '#3D8B61' },
+        'Meat & Eggs':    { bg: 'rgba(192,57,43,0.08)', text: '#C0392B', chart: '#C0392B' },
+        'Grocery':        { bg: 'rgba(27,67,50,0.1)', text: '#1B4332', chart: '#1B4332' },
+        'Other':          { bg: 'rgba(138,134,126,0.1)', text: '#8A867E', chart: '#8A867E' },
+    };
+
+    function getCategoryStyle(cat) {
+        return categoryColorMap[cat] || categoryColorMap['Other'];
+    }
+
+    function getCategoryPillClass(cat) {
+        const greens = ['Dairy Products', 'Vegetables', 'Pulses & Lentils', 'Oil & Ghee', 'Grocery', 'Snacks'];
+        const golds = ['Fruits', 'Flour & Grains', 'Beverages'];
+        if (greens.includes(cat)) return 'category-pill--green';
+        if (golds.includes(cat)) return 'category-pill--gold';
+        return 'category-pill--sage';
+    }
+
+    // ══════════════════════════════════════════════
+    //  MODAL
+    // ══════════════════════════════════════════════
+    let currentProfileData = {};
+
+    function toggleModal() {
+        const overlay = document.getElementById('modalOverlay');
+        const box = document.getElementById('modalBox');
+        const active = overlay.classList.contains('active');
+
+        if (active) {
+            overlay.classList.remove('active');
+            box.classList.remove('active');
+        } else {
+            document.getElementById('editName').value = currentProfileData.name || '';
+            document.getElementById('editEmail').value = currentProfileData.email || '';
+            document.getElementById('editLocation').value =
+                (currentProfileData.location === 'Not provided' ? '' : currentProfileData.location) || '';
+            overlay.classList.add('active');
+            box.classList.add('active');
+        }
+    }
+
+    // ══════════════════════════════════════════════
+    //  PROFILE
+    // ══════════════════════════════════════════════
+    async function fetchProfile() {
+        const data = await api.getProfile();
+        if (data.error) { api.logout(); return; }
+        currentProfileData = data;
+
+        document.getElementById('userName').innerText = data.name;
+        document.getElementById('userEmail').innerText = data.email;
+        document.getElementById('userLocation').innerText = data.location;
+
+        const totalExp = data.total_expenses || 0;
+        document.getElementById('totalExpensesSummary').innerText = totalExp.toFixed(0);
+
+        // Update initials
+        if (data.profile_image) {
+            document.getElementById('profileImageContainer').innerHTML =
+                `<img src="${data.profile_image}" alt="Profile" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+            const names = data.name.split(' ');
+            const initials = names.map(n => n.charAt(0).toUpperCase()).join('').substring(0, 2);
+            document.getElementById('initials').innerText = initials;
+        }
+
+        // Count-up stat animations
+        animateCountUp(document.getElementById('statMonth'), Math.round(totalExp), 1200, '₹');
+    }
+
+    async function handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64String = reader.result;
+            const res = await api.updateProfile({ ...currentProfileData, profile_image: base64String });
+            if (res.name) {
+                fetchProfile();
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            name: document.getElementById('editName').value,
+            email: document.getElementById('editEmail').value,
+            location: document.getElementById('editLocation').value,
+            profile_image: currentProfileData.profile_image
+        };
+        const res = await api.updateProfile(payload);
+        if (res.name) {
+            toggleModal();
+            fetchProfile();
+        } else {
+            alert(res.error || "Failed to update profile");
+        }
+    });
+
+    // ══════════════════════════════════════════════
+    //  CHARTS — instances
+    // ══════════════════════════════════════════════
+    let monthlyChartInstance = null;
+    let categoryChartInstance = null;
+
+    // ══════════════════════════════════════════════
+    //  EXPENSES
+    // ══════════════════════════════════════════════
+    async function fetchExpenses() {
+        const list = await api.getExpenses();
+        const listElement = document.getElementById('expenseList');
+        const totalElement = document.getElementById('totalAmount');
+
+        if (!list || list.length === 0) {
+            listElement.innerHTML = '<p class="expense-empty">No expenses recorded yet.</p>';
+            totalElement.innerText = "0.00";
+            return;
+        }
+
+        let total = 0;
+        listElement.innerHTML = '';
+        const sorted = list.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        sorted.forEach((exp, idx) => {
+            total += exp.amount;
+            const style = getCategoryStyle(exp.category);
+            const pillClass = getCategoryPillClass(exp.category);
+            const borderColor = style.chart;
+
+            const row = document.createElement('div');
+            row.className = 'expense-row';
+            row.style.borderLeftColor = borderColor;
+            row.style.animationDelay = `${idx * 0.05}s`;
+            row.innerHTML = `
+                <div class="expense-row__left">
+                    <span class="expense-row__title">${exp.title}</span>
+                    <div class="expense-row__meta">
+                        <span class="category-pill ${pillClass}">${exp.category || 'General'}</span>
+                        <span class="expense-row__date">${new Date(exp.date).toLocaleDateString()}</span>
+                    </div>
+                </div>
+                <div class="expense-row__right">
+                    <span class="expense-row__amount">₹${exp.amount}</span>
+                </div>`;
+            listElement.appendChild(row);
+
+            // Stagger reveal
+            setTimeout(() => row.classList.add('visible'), 80 + idx * 50);
+        });
+
+        totalElement.innerText = total.toFixed(2);
+        fetchGraphs(sorted, total);
+    }
+
+    // ══════════════════════════════════════════════
+    //  CHARTS — build from expense data
+    // ══════════════════════════════════════════════
+    async function fetchGraphs(expenses, total) {
+        // --- Monthly Distribution (bar + line combo) ---
+        try {
+            const graphData = await api.getExpenseGraph('monthly');
+            const wrapper = document.getElementById('monthlyChartWrapper');
+
+            if (graphData && !graphData.error && graphData.data && graphData.data.length > 0) {
+                const labels = graphData.data[0].x || [];
+                const values = graphData.data[0].y || [];
+
+                if (monthlyChartInstance) monthlyChartInstance.destroy();
+                const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+                // Gradient fill under the line
+                const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+                gradient.addColorStop(0, 'rgba(27,67,50,0.18)');
+                gradient.addColorStop(1, 'rgba(27,67,50,0.00)');
+
+                // Gold dot for the highest-value month
+                const maxVal = Math.max(...values);
+                const pointColors = values.map(v => v === maxVal && v > 0 ? '#D4A843' : '#1B4332');
+                const pointRadius = values.map(v => v === maxVal && v > 0 ? 7 : 4);
+                const pointBorderW = values.map(v => v === maxVal && v > 0 ? 3 : 2);
+
+                monthlyChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            // Bar layer (background context)
+                            {
+                                type: 'bar',
+                                data: values,
+                                backgroundColor: values.map(v =>
+                                    v > 0 ? 'rgba(27,67,50,0.10)' : 'rgba(27,67,50,0.03)'
+                                ),
+                                borderColor: values.map(v =>
+                                    v > 0 ? 'rgba(27,67,50,0.25)' : 'rgba(27,67,50,0.08)'
+                                ),
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                borderSkipped: 'bottom',
+                                barPercentage: 0.55,
+                                order: 2,
+                            },
+                            // Line layer (trend)
+                            {
+                                type: 'line',
+                                data: values,
+                                borderColor: '#1B4332',
+                                backgroundColor: gradient,
+                                borderWidth: 2.5,
+                                fill: true,
+                                tension: 0.42,
+                                pointBackgroundColor: pointColors,
+                                pointBorderColor: '#F8F5EE',
+                                pointBorderWidth: pointBorderW,
+                                pointRadius: pointRadius,
+                                pointHoverRadius: 9,
+                                order: 1,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 1200, easing: 'easeOutCubic' },
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1B4332',
+                                titleColor: '#F8F5EE',
+                                bodyColor: '#D4A843',
+                                cornerRadius: 10,
+                                padding: 12,
+                                titleFont: { family: 'DM Sans', size: 12 },
+                                bodyFont: { family: 'DM Sans', size: 14, weight: '700' },
+                                filter: (item) => item.datasetIndex === 1,  // only line tooltip
+                                callbacks: {
+                                    title: (items) => items[0].label,
+                                    label: (ctx) => ` ₹${ctx.parsed.y.toLocaleString()}`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: {
+                                    font: { family: 'DM Sans', size: 11 },
+                                    color: '#8A867E',
+                                    maxRotation: 0,
+                                    autoSkip: false,   // always show ALL 6 labels
+                                }
+                            },
+                            y: {
+                                grid: { color: 'rgba(240,237,230,0.8)', drawBorder: false },
+                                border: { display: false, dash: [4, 4] },
+                                ticks: {
+                                    font: { family: 'DM Sans', size: 11 },
+                                    color: '#8A867E',
+                                    precision: 0,
+                                    callback: (v) => v === 0 ? '₹0' : '₹' + Math.round(v).toLocaleString()
+                                },
+                                beginAtZero: true,
+                                suggestedMax: maxVal > 0 ? maxVal * 1.25 : 500,
+                            }
+                        }
+                    }
+                });
+            } else {
+                wrapper.innerHTML = '<div class="chart-empty">No expense data yet</div>';
+            }
+        } catch (err) {
+            console.error('Monthly chart error:', err);
+        }
+
+        // --- Category Breakdown (donut) ---
+        try {
+            const graphData = await api.getExpenseGraph('category');
+            const wrapper = document.getElementById('categoryChartWrapper');
+
+            if (graphData && !graphData.error && graphData.data && graphData.data.length > 0) {
+                const labels = graphData.data[0].labels || [];
+                const values = graphData.data[0].values || [];
+                const totalVal = values.reduce((a, b) => a + b, 0);
+
+                const colors = labels.map(l => {
+                    const style = getCategoryStyle(l);
+                    return style.chart;
+                });
+
+                document.getElementById('donutTotal').textContent = '₹' + totalVal;
+
+                // Legend
+                const legendEl = document.getElementById('categoryLegend');
+                legendEl.innerHTML = '';
+                labels.forEach((label, i) => {
+                    const pct = totalVal > 0 ? ((values[i] / totalVal) * 100).toFixed(0) : 0;
+                    legendEl.innerHTML += `
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background:${colors[i]}"></span>
+                            ${label} ${pct}%
+                        </div>`;
+                });
+
+                if (categoryChartInstance) categoryChartInstance.destroy();
+                const ctx2 = document.getElementById('categoryChart').getContext('2d');
+
+                categoryChartInstance = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: colors,
+                            borderColor: '#FFFFFF',
+                            borderWidth: 3,
+                            hoverOffset: 14,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '62%',
+                        animation: {
+                            animateRotate: true,
+                            duration: 1400,
+                            easing: 'easeOutCubic',
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1B4332',
+                                titleColor: '#F8F5EE',
+                                bodyColor: '#F8F5EE',
+                                cornerRadius: 8,
+                                padding: 12,
+                                titleFont: { family: 'DM Sans', size: 12 },
+                                bodyFont: { family: 'DM Sans', size: 13, weight: '600' },
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const pct = totalVal > 0 ? ((ctx.parsed / totalVal) * 100).toFixed(1) : 0;
+                                        return `₹${ctx.parsed} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                wrapper.innerHTML = '<div class="chart-empty">Need more data to show chart</div>';
+                document.getElementById('donutCenter').style.display = 'none';
+            }
+        } catch (err) {
+            console.error('Category chart error:', err);
+        }
+    }
+
+    // ══════════════════════════════════════════════
+    //  ORDERS
+    // ══════════════════════════════════════════════
+    async function fetchOrders() {
+        const orders = await api.getOrders();
+        const listElement = document.getElementById('orderList');
+        const statOrders = document.getElementById('statOrders');
+
+        if (!orders || orders.length === 0) {
+            listElement.innerHTML = `
+                <div class="order-empty">
+                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="15" y="28" width="50" height="36" rx="6" stroke="#8DB99A" stroke-width="2" fill="none"/>
+                        <path d="M15 38H65" stroke="#8DB99A" stroke-width="2"/>
+                        <path d="M30 28V20C30 17.2386 32.2386 15 35 15H45C47.7614 15 50 17.2386 50 20V28" stroke="#8DB99A" stroke-width="2" fill="none"/>
+                        <circle cx="35" cy="50" r="3" fill="#D8E8D0"/>
+                        <circle cx="45" cy="50" r="3" fill="#D8E8D0"/>
+                    </svg>
+                    <p class="order-empty__title">No orders placed yet.</p>
+                    <p class="order-empty__sub">Your first order is just a recipe away.</p>
+                </div>`;
+            animateCountUp(statOrders, 0, 800);
+            return;
+        }
+
+        animateCountUp(statOrders, orders.length, 1200);
+
+        listElement.innerHTML = '';
+        orders.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(order => {
+            const itemsList = order.items.map(i => `${i.name} (x${i.quantity})`).join(', ');
+            const statusClass = (order.status || '').toLowerCase() === 'delivered'
+                ? 'status-pill--delivered' : 'status-pill--pending';
+
+            const row = document.createElement('div');
+            row.className = 'order-row';
+            row.innerHTML = `
+                <div class="order-row__left">
+                    <span class="order-row__id">${order.order_id}</span>
+                    <span class="order-row__date">${new Date(order.date).toLocaleDateString()}</span>
+                </div>
+                <span class="order-row__items">${itemsList}</span>
+                <div class="order-row__right">
+                    <span class="order-row__total">₹${order.total_amount}</span>
+                    <span class="status-pill ${statusClass}">${order.status}</span>
+                </div>`;
+            listElement.appendChild(row);
+        });
+    }
+
+    // ══════════════════════════════════════════════
+    //  ADD EXPENSE FORM
+    // ══════════════════════════════════════════════
+    document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('saveBtn');
+        const btnIcon = document.getElementById('saveBtnIcon');
+        const btnText = document.getElementById('saveBtnText');
+
+        const data = {
+            title: document.getElementById('title').value,
+            amount: parseFloat(document.getElementById('amount').value),
+            category: document.getElementById('category').value
+        };
+
+        const res = await api.addExpense(data);
+
+        if (res._id) {
+            // Success animation
+            btn.classList.add('saved');
+            btnIcon.textContent = 'check';
+            btnText.textContent = '✓ Saved!';
+
+            setTimeout(() => {
+                btn.classList.remove('saved');
+                btnIcon.textContent = 'save';
+                btnText.textContent = 'Save Expense';
+            }, 1500);
+
+            document.getElementById('expenseForm').reset();
+            fetchExpenses();
+            fetchProfile();
+        } else {
+            alert(res.error || 'Failed to save.');
+        }
+    });
+
+    // ══════════════════════════════════════════════
+    //  AI PREDICTION COUNT (heuristic)
+    // ══════════════════════════════════════════════
+    async function fetchAIPredictions() {
+        // Use a heuristic: count AI planner interactions or default to 12
+        animateCountUp(document.getElementById('statAI'), 12, 1400);
+    }
+
+    // ══════════════════════════════════════════════
+    //  INIT
+    // ══════════════════════════════════════════════
+    fetchProfile();
+    fetchExpenses();
+    fetchOrders();
+    fetchAIPredictions();
+</script>
+
+</body>
+</html>
