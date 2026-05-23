@@ -71,37 +71,72 @@ _FOOD_SYNONYMS = {
     "aloo": "potato",
     "atta": "wheat flour",
     "besan": "besan",
+    "bataka": "potato",
+    "bhenda": "bhindi",
+    "bhendi": "bhindi",
     "bhindi": "bhindi",
+    "bhinda": "bhindi",
     "chawal": "rice",
+    "chana": "chana dal",
     "chole": "kabuli chana",
     "dahi": "curd",
     "dal": "dal",
     "dhania": "coriander",
+    "dudhi": "bottle gourd",
+    "dudh": "milk",
+    "dungli": "onion",
     "egg": "egg",
     "eggs": "egg",
+    "gajar": "carrot",
     "ginger garlic": "ginger garlic",
     "gobi": "cauliflower",
+    "gol": "jaggery",
+    "kakdi": "cucumber",
+    "karela": "bitter gourd",
     "jeera": "cumin",
     "kela": "banana",
+    "kobi": "cabbage",
+    "kothmir": "coriander",
+    "limbu": "lemon",
+    "mag": "moong dal",
     "maida": "all purpose flour",
+    "makai": "corn",
+    "marcha": "green chilli",
+    "marchu": "red chilli powder",
     "matar": "peas",
+    "methi": "fenugreek",
     "mirch": "green chilli",
     "palak": "spinach",
     "paneer": "paneer",
     "pyaaz": "onion",
+    "ringan": "brinjal",
     "rice": "rice",
+    "rotli": "roti",
+    "sakar": "sugar",
+    "shaak": "sabzi",
+    "shak": "sabzi",
+    "sing": "peanut",
     "tamatar": "tomato",
+    "tameta": "tomato",
+    "tuver": "toor dal",
+    "turiya": "ridge gourd",
+    "turia": "ridge gourd",
+    "vatana": "peas",
+    "valor": "hyacinth beans",
 }
 
 _FOOD_WORDS = {
-    "ajwain", "apple", "atta", "banana", "basmati", "besan", "bhatura", "biryani",
+    "ajwain", "apple", "atta", "banana", "basmati", "bataka", "besan", "bhatura", "bhenda",
+    "bhendi", "bhinda", "biryani",
     "burger", "butter", "capsicum", "carrot", "chana", "cheese", "chicken", "chilli",
     "chole", "coriander", "cream", "cumin", "curd", "curry", "dal", "daal", "dosa",
-    "egg", "flour", "food", "garam", "garlic", "ghee", "ginger", "idli", "jaggery",
+    "egg", "flour", "food", "gajar", "garam", "garlic", "ghee", "ginger", "halva",
+    "halwa", "halvo", "halwo", "idli", "jaggery",
     "khichdi", "lemon", "maida", "masala", "milk", "moong", "noodles", "oil", "onion",
-    "pakoda", "pakwaan", "paneer", "pasta", "peas", "pizza", "poha", "potato", "rajma",
-    "recipe", "rice", "roti", "sabzi", "salt", "samosa", "semolina", "sooji", "soup",
-    "spinach", "sugar", "tomato", "toor", "turmeric", "urad", "vegetable", "wheat",
+    "pakoda", "pakwaan", "paneer", "pani", "pasta", "peas", "pizza", "poha", "potato",
+    "puri", "rajma", "recipe", "rice", "roti", "sabzi", "shaak", "shak", "salt",
+    "samosa", "semolina", "sooji", "soup", "spinach", "sugar", "tamatar", "tamarind", "tomato", "toor", "turmeric",
+    "urad", "vada", "vegetable", "wheat",
     "yogurt",
     *_FOOD_SYNONYMS.keys(),
 }
@@ -114,8 +149,34 @@ _DISH_ALIASES = {
     "vegetable biryani": "biryani",
     "paneer butter masala": "paneer butter masala",
     "butter paneer": "paneer butter masala",
+    "bhenda nu shaak": "bhindi shaak",
+    "bhenda nu shak": "bhindi shaak",
+    "bhendi masala": "bhindi shaak",
+    "bhendi nu shaak": "bhindi shaak",
+    "bhendi nu shak": "bhindi shaak",
+    "bhinda nu shaak": "bhindi shaak",
+    "bhinda nu shak": "bhindi shaak",
+    "bhindi masala": "bhindi shaak",
+    "bhindi nu shaak": "bhindi shaak",
+    "bhindi nu shak": "bhindi shaak",
+    "carrot halwa": "gajar halwa",
+    "gajar ka halwa": "gajar halwa",
+    "gajar halva": "gajar halwa",
+    "gajar halwa": "gajar halwa",
+    "gajar halvo": "gajar halwa",
+    "gajar halwo": "gajar halwa",
+    "gajar no halva": "gajar halwa",
+    "gajar no halwa": "gajar halwa",
+    "gajar no halvo": "gajar halwa",
+    "gajar no halwo": "gajar halwa",
     "dal tadka": "dal tadka",
     "daal tadka": "dal tadka",
+    "dal vada": "dal vada",
+    "daal vada": "dal vada",
+    "dal wada": "dal vada",
+    "daal wada": "dal vada",
+    "dal vda": "dal vada",
+    "daal vda": "dal vada",
     "dal": "dal tadka",
     "daal": "dal tadka",
     "chole": "chole",
@@ -123,6 +184,11 @@ _DISH_ALIASES = {
     "pasta": "pasta aglio e olio",
     "pasta aglio e olio": "pasta aglio e olio",
     "khichdi": "khichdi",
+    "pani puri": "pani puri",
+    "pani poori": "pani puri",
+    "golgappa": "pani puri",
+    "gol gappa": "pani puri",
+    "puchka": "pani puri",
     "daal pakwaan": "daal pakwaan",
     "dal pakwan": "daal pakwaan",
     "aloo sabzi": "aloo sabzi",
@@ -313,6 +379,103 @@ _RECIPE_FORMULAS = {
             "Step 4: Finish uncovered for a thicker masala coating.",
         ],
     },
+    "bhindi shaak": {
+        "dish": "Bhinda Nu Shaak",
+        "description": "A Gujarati-style dry okra sabzi with onion, tomato, and everyday masala.",
+        "prep_base": 15,
+        "cook_base": 25,
+        "ingredients": [
+            ("Bhindi", 120, "g", "Vegetables", "main"),
+            ("Onion", 30, "g", "Vegetables", "main"),
+            ("Tomato", 30, "g", "Vegetables", "main"),
+            ("Vegetable Oil", 8, "ml", "Oil", "main"),
+            ("Cumin Seeds (Jeera)", 0.6, "g", "Spices", "spice"),
+            ("Turmeric Powder (Haldi)", 0.3, "g", "Spices", "spice"),
+            ("Red Chilli Powder", 0.5, "g", "Spices", "spice"),
+            ("Coriander Powder (Dhania)", 0.8, "g", "Spices", "spice"),
+            ("Dry Mango Powder (Amchur)", 0.5, "g", "Spices", "spice"),
+            ("Salt", 2.2, "g", "Pantry", "spice"),
+        ],
+        "steps": [
+            "Step 1: Wash bhindi and dry it completely before chopping, because moisture can make the shaak sticky.",
+            "Step 2: Trim and cut the bhindi into small pieces, then chop onion and tomato for the masala base.",
+            "Step 3: Heat oil, crackle cumin seeds, and saute onion until it turns light golden and sweet.",
+            "Step 4: Add bhindi with turmeric, chilli powder, coriander powder, and salt, then cook uncovered until nearly tender.",
+            "Step 5: Add tomato and amchur near the end, toss gently, and finish dry so the bhinda nu shaak stays crisp.",
+        ],
+    },
+    "gajar halwa": {
+        "dish": "Gajar No Halvo",
+        "description": "A rich Gujarati-style carrot halwa slow-cooked with milk, ghee, sugar, and nuts.",
+        "prep_base": 20,
+        "cook_base": 50,
+        "ingredients": [
+            ("Carrot", 180, "g", "Vegetables", "main"),
+            ("Full Cream Milk", 180, "ml", "Dairy", "main"),
+            ("Sugar", 35, "g", "Pantry", "main"),
+            ("Ghee", 12, "ml", "Dairy", "main"),
+            ("Cashew", 8, "g", "Pantry", "main"),
+            ("Almond", 8, "g", "Pantry", "main"),
+            ("Cardamom Powder", 0.4, "g", "Spices", "spice"),
+        ],
+        "steps": [
+            "Step 1: Wash, peel, and grate the carrots finely so they cook evenly and release sweetness into the milk.",
+            "Step 2: Heat ghee in a heavy pan, add grated carrot, and saute for 5 minutes until the raw smell reduces.",
+            "Step 3: Pour in full cream milk and simmer on medium-low heat, stirring often until the milk reduces deeply.",
+            "Step 4: Add sugar and continue cooking until the halvo turns glossy and starts leaving the sides of the pan.",
+            "Step 5: Mix in cardamom powder and fried cashew-almond pieces, then serve warm or chilled as preferred.",
+        ],
+    },
+    "dal vada": {
+        "dish": "Dal Vada",
+        "description": "Crispy lentil fritters made with soaked chana dal, herbs, and warm spices.",
+        "prep_base": 30,
+        "cook_base": 35,
+        "ingredients": [
+            ("Chana Dal", 80, "g", "Pulses", "main"),
+            ("Onion", 25, "g", "Vegetables", "main"),
+            ("Ginger", 2, "g", "Vegetables", "main"),
+            ("Garlic", 2, "g", "Vegetables", "main"),
+            ("Green Chilli", 0.5, "pcs", "Vegetables", "main"),
+            ("Fresh Coriander Leaves", 5, "g", "Vegetables", "main"),
+            ("Cumin Seeds (Jeera)", 0.8, "g", "Spices", "spice"),
+            ("Red Chilli Powder", 0.5, "g", "Spices", "spice"),
+            ("Salt", 2.5, "g", "Pantry", "spice"),
+            ("Vegetable Oil", 25, "ml", "Oil", "main"),
+        ],
+        "steps": [
+            "Step 1: Wash chana dal well and soak it for at least 3 hours so it grinds easily.",
+            "Step 2: Drain the dal completely, then grind most of it coarsely with ginger, garlic, and green chilli.",
+            "Step 3: Mix in chopped onion, coriander, cumin, chilli powder, and salt; keep the batter thick and textured.",
+            "Step 4: Shape small flattened vadas with wet hands so they fry evenly and become crisp at the edges.",
+            "Step 5: Fry on medium heat until deep golden, turning once or twice, then drain and serve hot.",
+        ],
+    },
+    "pani puri": {
+        "dish": "Pani Puri",
+        "description": "Crisp puris filled with spiced potato, chickpeas, and tangy mint-tamarind water.",
+        "prep_base": 35,
+        "cook_base": 20,
+        "ingredients": [
+            ("Puri", 6, "pcs", "Pantry", "main"),
+            ("Potato", 80, "g", "Vegetables", "main"),
+            ("Kabuli Chana", 30, "g", "Pulses", "main"),
+            ("Tamarind", 8, "g", "Pantry", "main"),
+            ("Fresh Coriander Leaves", 8, "g", "Vegetables", "main"),
+            ("Mint Leaves", 8, "g", "Vegetables", "main"),
+            ("Green Chilli", 0.4, "pcs", "Vegetables", "main"),
+            ("Cumin Seeds (Jeera)", 0.6, "g", "Spices", "spice"),
+            ("Chaat Masala", 1, "g", "Spices", "spice"),
+            ("Salt", 2, "g", "Pantry", "spice"),
+        ],
+        "steps": [
+            "Step 1: Boil potatoes until tender, peel them, and mash with salt, cumin, and chaat masala.",
+            "Step 2: Cook soaked kabuli chana until soft, then mix it into the potato filling for body.",
+            "Step 3: Blend coriander, mint, green chilli, tamarind, cumin, salt, and chilled water into tangy pani.",
+            "Step 4: Strain and chill the pani, adjusting salt and sourness so it tastes bright and punchy.",
+            "Step 5: Crack each puri gently, fill with potato-chana mixture, dip in pani, and serve immediately.",
+        ],
+    },
 }
 
 _RECIPE_FORMULAS["daal pakwaan"] = {
@@ -355,7 +518,7 @@ C) OFF-TOPIC / NON-FOOD - about coding, sports, politics, math, or other domains
 D) AMBIGUOUS - could be food but unclear; interpret charitably as a dish
 
 If category B or C, return EXACTLY this JSON and NOTHING else:
-{"error": "I can only help with food and grocery planning. Please enter a dish name like \"Paneer Butter Masala for 4\" or \"Samosa for 500 people\"."}
+{"error": "plz enter valied input"}
 
 For D, make a reasonable food interpretation and proceed.
 
@@ -423,6 +586,8 @@ Reply ONLY with valid JSON (no markdown fences, no text outside JSON):
 
 RULES:
 - quantity must be a number string only ("75" not "75 kg" -- unit field is separate)
+- description must be one appetizing sentence and mention catalog matching plus auto-adding missing essentials for testing
+- use common grocery names to maximize catalog matches (e.g., "potato" not "aloo")
 - All names in English
 - At least 4 recipe_steps
 - ingredients must never be empty
@@ -443,14 +608,13 @@ def _get_openai():
 _OFFTRACK_KEYWORDS = [
     "function", "algorithm", "coding", "python", "javascript", "code", "program",
     "blockchain", "crypto", "nft", "equation", "solve", "integral", "derivative",
+    "math", "mathematics", "algebra", "calculus",
     "politics", "election", "president", "war", "sport", "cricket", "football",
     "movie", "actor", "news", "history", "geography", "capital of",
 ]
 
-_ERROR_MSG = (
-    "I can only help with food and grocery planning 🍽️. "
-    "Please enter a dish name like 'Paneer Butter Masala for 4' or 'Samosa for 500 people'."
-)
+_ERROR_MSG = "plz enter valied input"
+_LOCAL_FIRST_DISHES = {"bhindi shaak", "dal vada", "gajar halwa", "pani puri"}
 
 
 def _normalise_text(text: str) -> str:
@@ -487,11 +651,11 @@ def _is_garbage(text: str) -> bool:
 def _extract_servings(query: str) -> int:
     lowered = query.lower()
     patterns = [
-        r"\bfor\s+(\d{1,5})\s*(?:people|persons|guests|servings|serves|pax|plates|samosas?)?\b",
+        r"\bfor\s+(\d{1,5})\s*(?:people|peoples|persons|guests|servings|serves|pax|plates|samosas?)?\b",
         r"\bserves?\s+(\d{1,5})\b",
         r"\bservings?\s*[:=]?\s*(\d{1,5})\b",
         r"\b(?:party|wedding|event|bulk|batch|order)\s+(?:of|for)?\s*(\d{1,5})\b",
-        r"\b(\d{1,5})\s*(?:people|persons|guests|servings|pax|plates|samosas?)\b",
+        r"\b(\d{1,5})\s*(?:people|peoples|persons|guests|servings|pax|plates|samosas?)\b",
     ]
     for pattern in patterns:
         match = re.search(pattern, lowered)
@@ -576,6 +740,212 @@ def _build_formula_recipe(dish_key: str, servings: int) -> dict:
     }
 
 
+_REGIONAL_SUBJECT_DISPLAY = {
+    "bitter gourd": "Karela",
+    "bottle gourd": "Dudhi",
+    "brinjal": "Ringan",
+    "cabbage": "Kobi",
+    "carrot": "Gajar",
+    "corn": "Makai",
+    "cucumber": "Kakdi",
+    "fenugreek": "Methi",
+    "hyacinth beans": "Valor",
+    "moong dal": "Mag",
+    "peas": "Vatana",
+    "potato": "Bataka",
+    "ridge gourd": "Turiya",
+    "toor dal": "Tuver",
+}
+
+_INGREDIENT_DISPLAY = {
+    "all purpose flour": "All Purpose Flour (Maida)",
+    "bitter gourd": "Bitter Gourd",
+    "bottle gourd": "Bottle Gourd",
+    "green chilli": "Green Chilli",
+    "hyacinth beans": "Hyacinth Beans",
+    "moong dal": "Moong Dal",
+    "red chilli powder": "Red Chilli Powder",
+    "ridge gourd": "Ridge Gourd",
+    "toor dal": "Toor Dal",
+}
+
+_INGREDIENT_CATEGORY = {
+    "all purpose flour": "Flour",
+    "almond": "Pantry",
+    "bitter gourd": "Vegetables",
+    "bottle gourd": "Vegetables",
+    "brinjal": "Vegetables",
+    "cabbage": "Vegetables",
+    "carrot": "Vegetables",
+    "cashew": "Pantry",
+    "chana dal": "Pulses",
+    "corn": "Vegetables",
+    "cucumber": "Vegetables",
+    "curd": "Dairy",
+    "fenugreek": "Vegetables",
+    "hyacinth beans": "Vegetables",
+    "milk": "Dairy",
+    "moong dal": "Pulses",
+    "paneer": "Dairy",
+    "peas": "Vegetables",
+    "potato": "Vegetables",
+    "ridge gourd": "Vegetables",
+    "toor dal": "Pulses",
+}
+
+_REGIONAL_FILLER_WORDS = {
+    "a", "an", "banavanu", "banavo", "banao", "banav", "cook", "dish", "for", "hu",
+    "i", "ka", "ke", "ko", "make", "mara", "mate", "me", "need", "please", "pls",
+    "prepare", "recipe", "the", "to", "want",
+}
+
+
+def _remove_serving_phrases(query: str) -> str:
+    cleaned = _normalise_text(query)
+    cleaned = re.sub(
+        r"\bfor\s+\d{1,5}\s*(?:people|peoples|persons|guests|servings|serves|pax|plates)?\b",
+        " ",
+        cleaned,
+    )
+    cleaned = re.sub(r"\bserves?\s+\d{1,5}\b", " ", cleaned)
+    cleaned = re.sub(r"\bservings?\s*[:=]?\s*\d{1,5}\b", " ", cleaned)
+    cleaned = re.sub(r"\b\d{1,5}\s*(?:people|peoples|persons|guests|servings|pax|plates)\b", " ", cleaned)
+    cleaned = re.sub(r"\b\d+\b", " ", cleaned)
+    cleaned = re.sub(r"[^a-z\s]", " ", cleaned)
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+
+def _canonical_food_subject(subject: str) -> str | None:
+    cleaned = _normalise_text(subject)
+    cleaned = re.sub(r"[^a-z\s]", " ", cleaned)
+    words = [word for word in cleaned.split() if word not in _REGIONAL_FILLER_WORDS]
+    cleaned = " ".join(words)
+    if not cleaned:
+        return None
+
+    for source, target in sorted(_FOOD_SYNONYMS.items(), key=lambda item: len(item[0]), reverse=True):
+        if re.search(rf"\b{re.escape(source)}\b", cleaned):
+            return target
+    if cleaned in _INGREDIENT_CATEGORY:
+        return cleaned
+    if cleaned in _FOOD_WORDS:
+        return cleaned
+    return None
+
+
+def _regional_subject_name(canonical: str) -> str:
+    return _REGIONAL_SUBJECT_DISPLAY.get(canonical, canonical.title())
+
+
+def _ingredient_name(canonical: str) -> str:
+    return _INGREDIENT_DISPLAY.get(canonical, canonical.title())
+
+
+def _ingredient_category(canonical: str) -> str:
+    return _INGREDIENT_CATEGORY.get(canonical, "Vegetables")
+
+
+def _scale_recipe_rows(rows: list[tuple[str, float, str, str, str]], servings: int) -> list[dict]:
+    ingredients = []
+    for name, per_serving, unit, category, group in rows:
+        quantity, out_unit = _format_quantity(per_serving * servings, unit, group, servings)
+        ingredients.append(
+            {
+                "name": name,
+                "quantity": quantity,
+                "unit": out_unit,
+                "category": category,
+            }
+        )
+    return ingredients
+
+
+def _build_gujarati_halwa_recipe(canonical: str, servings: int) -> dict:
+    subject = _regional_subject_name(canonical)
+    ingredient = _ingredient_name(canonical)
+    category = _ingredient_category(canonical)
+    main_quantity = 220 if canonical == "bottle gourd" else 180
+    rows = [
+        (ingredient, main_quantity, "g", category, "main"),
+        ("Full Cream Milk", 180, "ml", "Dairy", "main"),
+        ("Sugar", 35, "g", "Pantry", "main"),
+        ("Ghee", 12, "ml", "Dairy", "main"),
+        ("Cashew", 8, "g", "Pantry", "main"),
+        ("Almond", 8, "g", "Pantry", "main"),
+        ("Cardamom Powder", 0.4, "g", "Spices", "spice"),
+    ]
+    subject_lower = subject.lower()
+    return {
+        "dish": f"{subject} No Halvo",
+        "servings": servings,
+        "description": f"A Gujarati-style {subject_lower} halvo slow-cooked with milk, ghee, sugar, nuts, and cardamom.",
+        "prep_time": _estimate_time(20, servings, "prep"),
+        "cook_time": _estimate_time(50, servings, "cook"),
+        "ingredients": _scale_recipe_rows(rows, servings),
+        "recipe_steps": [
+            f"Step 1: Wash, peel, and grate the {ingredient.lower()} finely so it cooks evenly and blends into the milk.",
+            f"Step 2: Heat ghee in a heavy pan, add the grated {ingredient.lower()}, and saute until the raw smell reduces.",
+            "Step 3: Pour in full cream milk and simmer on medium-low heat, stirring often until the milk reduces deeply.",
+            "Step 4: Add sugar and continue cooking until the halvo turns glossy and starts leaving the sides of the pan.",
+            "Step 5: Mix in cardamom powder and fried cashew-almond pieces, then serve warm or chilled as preferred.",
+        ],
+    }
+
+
+def _build_gujarati_shaak_recipe(canonical: str, servings: int) -> dict:
+    subject = _regional_subject_name(canonical)
+    ingredient = _ingredient_name(canonical)
+    category = _ingredient_category(canonical)
+    rows = [
+        (ingredient, 180, "g", category, "main"),
+        ("Vegetable Oil", 8, "ml", "Oil", "main"),
+        ("Mustard Seeds (Rai)", 0.6, "g", "Spices", "spice"),
+        ("Cumin Seeds (Jeera)", 0.6, "g", "Spices", "spice"),
+        ("Turmeric Powder (Haldi)", 0.3, "g", "Spices", "spice"),
+        ("Red Chilli Powder", 0.5, "g", "Spices", "spice"),
+        ("Coriander Powder (Dhania)", 0.8, "g", "Spices", "spice"),
+        ("Salt", 2.2, "g", "Pantry", "spice"),
+        ("Fresh Coriander Leaves", 3, "g", "Vegetables", "main"),
+    ]
+    return {
+        "dish": f"{subject} Nu Shaak",
+        "servings": servings,
+        "description": f"A simple Gujarati-style {subject.lower()} shaak with rai, jeera, turmeric, chilli, and coriander.",
+        "prep_time": _estimate_time(15, servings, "prep"),
+        "cook_time": _estimate_time(25, servings, "cook"),
+        "ingredients": _scale_recipe_rows(rows, servings),
+        "recipe_steps": [
+            f"Step 1: Wash and cut the {ingredient.lower()} into even pieces so every piece cooks at the same speed.",
+            "Step 2: Heat oil in a kadai, then crackle mustard seeds and cumin seeds until aromatic.",
+            f"Step 3: Add the {ingredient.lower()}, turmeric, chilli powder, coriander powder, and salt, then mix well.",
+            "Step 4: Cover and cook on medium-low heat, stirring every few minutes so the shaak does not stick.",
+            "Step 5: Finish with fresh coriander and keep the shaak mostly dry before serving with rotli or dal.",
+        ],
+    }
+
+
+def _build_regional_pattern_recipe(query: str, servings: int) -> dict | None:
+    cleaned = _remove_serving_phrases(query)
+    if not cleaned:
+        return None
+
+    patterns = [
+        r"(?P<subject>[a-z\s]+?)\s+(?:no|nu|ni|na)\s+(?P<kind>halvo|halwa|halva|halwo|shaak|shak|sabzi)\b",
+        r"(?P<subject>[a-z\s]+?)\s+(?P<kind>halvo|halwa|halva|halwo|shaak|shak|sabzi)\b",
+    ]
+    for pattern in patterns:
+        matches = list(re.finditer(pattern, cleaned))
+        for match in reversed(matches):
+            canonical = _canonical_food_subject(match.group("subject"))
+            if not canonical:
+                continue
+            kind = match.group("kind")
+            if kind.startswith("hal"):
+                return _build_gujarati_halwa_recipe(canonical, servings)
+            return _build_gujarati_shaak_recipe(canonical, servings)
+    return None
+
+
 def _fallback_parse_dish_request(user_input: str) -> dict:
     query = user_input.strip()
     if _is_garbage(query):
@@ -585,6 +955,9 @@ def _fallback_parse_dish_request(user_input: str) -> dict:
     dish_key = _extract_dish_key(query)
     if dish_key:
         return _build_formula_recipe(dish_key, servings)
+    regional_recipe = _build_regional_pattern_recipe(query, servings)
+    if regional_recipe:
+        return regional_recipe
 
     dish = _clean_dish_name(query)
     scale = max(servings, 1)
@@ -613,6 +986,15 @@ def _fallback_parse_dish_request(user_input: str) -> dict:
 
 
 def parse_dish_request(user_input: str) -> dict:
+    if not _is_garbage(user_input):
+        servings = _extract_servings(user_input)
+        dish_key = _extract_dish_key(user_input)
+        if dish_key in _LOCAL_FIRST_DISHES:
+            return _build_formula_recipe(dish_key, servings)
+        regional_recipe = _build_regional_pattern_recipe(user_input, servings)
+        if regional_recipe:
+            return regional_recipe
+
     client = _get_openai()
     if client is None:
         return _fallback_parse_dish_request(user_input)
@@ -642,6 +1024,251 @@ def parse_dish_request(user_input: str) -> dict:
         return _fallback_parse_dish_request(user_input)
 
 
+_AUTO_ADD_PRICE_BY_CATEGORY = {
+    "vegetables": 40,
+    "fruits": 60,
+    "pulses": 120,
+    "grains": 90,
+    "flour": 80,
+    "dairy": 90,
+    "oil": 120,
+    "spices": 60,
+    "pantry": 50,
+    "other": 50,
+}
+
+_AUTO_ADD_IMAGE_BY_CATEGORY = {
+    "vegetables": "/static/images/products/vegetables_basket.png",
+    "fruits": "/static/images/products/fruits_basket.png",
+    "pulses": "/static/images/products/pulses_bowl.png",
+    "grains": "/static/images/products/rice_bowl.png",
+    "flour": "/static/images/products/flour_bowl.png",
+    "dairy": "/static/images/products/milk_bottle.png",
+    "oil": "/static/images/products/oil_bottle.png",
+    "spices": "/static/images/products/spices_bowl.png",
+}
+
+
+def _slugify(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.strip().lower())
+    slug = slug.strip("-")
+    return slug or "item"
+
+
+def _default_weight_for_unit(unit: str) -> str:
+    unit = (unit or "").lower()
+    if unit in {"g", "kg"}:
+        return "1kg"
+    if unit in {"ml", "l", "L"}:
+        return "1L"
+    if unit == "pcs":
+        return "1pc"
+    if unit in {"tsp", "tbsp"}:
+        return "50g"
+    if unit == "bunch":
+        return "1 bunch"
+    if unit == "pack":
+        return "1 pack"
+    return "1 unit"
+
+
+def _auto_add_product(name: str, category: str, unit: str) -> dict | None:
+    if not getattr(settings, "PLANNER_AUTO_ADD_PRODUCTS", True):
+        return None
+    if not name:
+        return None
+
+    category = category or "Other"
+    category_key = category.strip().lower()
+    base_price = _AUTO_ADD_PRICE_BY_CATEGORY.get(category_key, 50)
+    image_url = _AUTO_ADD_IMAGE_BY_CATEGORY.get(category_key, "")
+
+    payload = {
+        "name": name.strip(),
+        "category": category,
+        "price": base_price,
+        "discount": 0,
+        "weight": _default_weight_for_unit(unit),
+        "slug": _slugify(name),
+        "image_url": image_url,
+        "keywords": f"{name.strip()} {category}",
+        "is_best_seller": False,
+        "unit": unit,
+    }
+
+    try:
+        collection = mongo_client.get_products_collection()
+        result = collection.insert_one(payload)
+        payload["_id"] = result.inserted_id
+        return payload
+    except Exception as exc:
+        logger.warning("Auto-add product failed: %s", exc)
+        return None
+
+
+_PIECE_WEIGHT_GRAMS = {
+    "garlic": 5,
+    "green chilli": 5,
+    "lemon": 50,
+    "onion": 100,
+    "potato": 150,
+    "tomato": 100,
+}
+
+_BUNCH_WEIGHT_GRAMS = {
+    "coriander": 100,
+    "fresh coriander leaves": 100,
+    "mint leaves": 100,
+}
+
+
+def _to_float(value) -> float | None:
+    try:
+        return float(str(value).replace(",", "").strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def _normalise_unit(unit: str) -> str:
+    unit = (unit or "").strip().lower()
+    aliases = {
+        "grams": "g",
+        "gram": "g",
+        "kgs": "kg",
+        "kilogram": "kg",
+        "kilograms": "kg",
+        "litre": "l",
+        "liter": "l",
+        "litres": "l",
+        "liters": "l",
+        "pcs": "pc",
+        "piece": "pc",
+        "pieces": "pc",
+        "clove": "clove",
+        "cloves": "clove",
+        "bunches": "bunch",
+        "packs": "pack",
+        "packet": "pack",
+        "packets": "pack",
+        "dozen": "dozen",
+    }
+    return aliases.get(unit, unit)
+
+
+def _lookup_piece_weight(name: str) -> float | None:
+    lowered = _normalise_text(name)
+    for key, grams in _PIECE_WEIGHT_GRAMS.items():
+        if key in lowered:
+            return grams
+    return None
+
+
+def _lookup_bunch_weight(name: str) -> float | None:
+    lowered = _normalise_text(name)
+    for key, grams in _BUNCH_WEIGHT_GRAMS.items():
+        if key in lowered:
+            return grams
+    return None
+
+
+def _quantity_to_base(quantity, unit: str, name: str, category: str) -> tuple[str, float] | None:
+    qty = _to_float(quantity)
+    if qty is None or qty <= 0:
+        return None
+
+    unit = _normalise_unit(unit)
+    category = (category or "").strip().lower()
+    if unit == "kg":
+        return "weight", qty * 1000
+    if unit == "g":
+        return "weight", qty
+    if unit == "l":
+        return "volume", qty * 1000
+    if unit == "ml":
+        return "volume", qty
+    if unit == "tsp":
+        return ("volume", qty * 5) if category == "oil" else ("weight", qty * 5)
+    if unit == "tbsp":
+        return ("volume", qty * 15) if category == "oil" else ("weight", qty * 15)
+    if unit in {"pc", "clove"}:
+        grams = 5 if unit == "clove" else _lookup_piece_weight(name)
+        if grams:
+            return "weight", qty * grams
+        return "count", qty
+    if unit == "bunch":
+        grams = _lookup_bunch_weight(name)
+        if grams:
+            return "weight", qty * grams
+        return "count", qty
+    if unit == "dozen":
+        return "count", qty * 12
+    if unit == "pack":
+        return "count", qty
+    return "count", qty
+
+
+def _package_to_base(weight: str, product_unit: str, name: str, category: str) -> tuple[str, float] | None:
+    text = f"{weight or ''} {product_unit or ''}".strip().lower()
+    if not text:
+        return None
+
+    match = re.search(r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)", text)
+    if not match:
+        return None
+
+    amount = _to_float(match.group(1))
+    unit = _normalise_unit(match.group(2))
+    if amount is None or amount <= 0:
+        return None
+
+    if unit == "kg":
+        return "weight", amount * 1000
+    if unit == "g":
+        return "weight", amount
+    if unit == "l":
+        return "volume", amount * 1000
+    if unit == "ml":
+        return "volume", amount
+    if unit == "dozen":
+        return "count", amount * 12
+    if unit in {"pc", "clove"}:
+        grams = 5 if unit == "clove" else _lookup_piece_weight(name)
+        if grams:
+            return "weight", amount * grams
+        return "count", amount
+    if unit == "bunch":
+        grams = _lookup_bunch_weight(name)
+        if grams:
+            return "weight", amount * grams
+        return "count", amount
+    if unit == "pack":
+        return "count", amount
+    return None
+
+
+def _estimate_package_count(ingredient: dict, product: dict) -> int:
+    needed = _quantity_to_base(
+        ingredient.get("quantity", ""),
+        ingredient.get("unit", ""),
+        ingredient.get("name", ""),
+        ingredient.get("category", "Other"),
+    )
+    package = _package_to_base(
+        product.get("weight", ""),
+        product.get("unit", ""),
+        product.get("name", ingredient.get("name", "")),
+        product.get("category", ingredient.get("category", "Other")),
+    )
+    if not needed or not package:
+        return 1
+
+    needed_dimension, needed_amount = needed
+    package_dimension, package_amount = package
+    if needed_dimension != package_dimension or package_amount <= 0:
+        return 1
+    return max(1, math.ceil(needed_amount / package_amount))
+
+
 def match_ingredients_to_products(ingredients: list) -> list:
     matched_items = []
     global _mongo_lookup_available
@@ -653,6 +1280,7 @@ def match_ingredients_to_products(ingredients: list) -> list:
         category = ingredient.get("category", "Other")
 
         product = None
+        auto_added = False
         if _mongo_lookup_available:
             try:
                 product = mongo_client.search_product_by_name(name)
@@ -660,23 +1288,36 @@ def match_ingredients_to_products(ingredients: list) -> list:
                 _mongo_lookup_available = False
                 logger.warning("Mongo lookup disabled for this run: %s", exc)
 
+        if not product:
+            product = _auto_add_product(name, category, unit)
+            auto_added = product is not None
+
         if product:
             image = product.get("image_url", "")
             if not image and product.get("images"):
                 image = product["images"][0]
+            product_price = product.get("price", product.get("base_price", 0)) or 0
+            discount = product.get("discount", 0) or 0
+            unit_price = round(product_price * (1 - discount / 100), 2)
+            package_count = _estimate_package_count(ingredient, product)
+            estimated_price = round(unit_price * package_count, 2)
             matched_items.append(
                 {
                     "ingredient_name": name,
                     "needed_quantity": f"{quantity}{unit}",
                     "product_id": str(product["_id"]),
                     "product_name": product.get("name", name),
-                    "product_price": product.get("price", product.get("base_price", 0)),
+                    "product_price": product_price,
+                    "unit_price": unit_price,
+                    "package_count": package_count,
+                    "estimated_price": estimated_price,
                     "product_unit": product.get("unit", unit),
                     "product_weight": product.get("weight", ""),
                     "product_image": image,
                     "product_category": product.get("category", category),
-                    "discount": product.get("discount", 0),
+                    "discount": discount,
                     "matched": True,
+                    "auto_added": auto_added,
                 }
             )
         else:
@@ -687,12 +1328,16 @@ def match_ingredients_to_products(ingredients: list) -> list:
                     "product_id": None,
                     "product_name": name,
                     "product_price": 0,
+                    "unit_price": 0,
+                    "package_count": 0,
+                    "estimated_price": 0,
                     "product_unit": unit,
                     "product_weight": "",
                     "product_image": "",
                     "product_category": category,
                     "discount": 0,
                     "matched": False,
+                    "auto_added": False,
                 }
             )
     return matched_items
@@ -709,7 +1354,7 @@ def generate_plan(user_query: str) -> dict:
 
     matched_items = match_ingredients_to_products(ingredients)
     total_price = sum(
-        item["product_price"] * (1 - item["discount"] / 100)
+        item.get("estimated_price", 0)
         for item in matched_items
         if item["matched"]
     )

@@ -96,6 +96,12 @@ MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME") or os.getenv("MONGO_DB_NAME", "ba
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+PLANNER_AUTO_ADD_PRODUCTS = os.getenv("PLANNER_AUTO_ADD_PRODUCTS", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()

@@ -1,0 +1,47 @@
+@media (min-width: 769px) {
+  * {
+    cursor: none !important;
+  }
+}
+
+.cursor,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
+.cursor {
+  width: 10px;
+  height: 10px;
+  background: #D4A843;
+  border-radius: 50%;
+  z-index: 9999;
+  opacity: 0.95;
+}
+
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(212, 168, 67, 0.55);
+  border-radius: 50%;
+  z-index: 9998;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .cursor,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor,
+  .cursor-ring {
+    display: none;
+  }
+}

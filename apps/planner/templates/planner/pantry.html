@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,14 +7,11 @@
 <title>Pantry Chef | BasketIQ</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="{% static 'css/cursor.css' %}"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#F8F5EE;color:#2C2C2A;min-height:100vh}
-@media(min-width:769px){*{cursor:none!important}}
-.cursor{position:fixed;width:12px;height:12px;background:#D4A843;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);top:0;left:0;transition:transform .12s ease}
-.cursor-ring{position:fixed;width:40px;height:40px;border:1.5px solid rgba(212,168,67,.55);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%) scale(1);top:0;left:0;transition:transform .25s ease,border-color .2s ease}
-@media(max-width:768px){.cursor,.cursor-ring{display:none}}
 #pageCurtain{position:fixed;inset:0;z-index:9000;background:#1B4332;transform:translateY(-100%);transition:transform .55s cubic-bezier(.76,0,.24,1);pointer-events:none}
 #pageCurtain.enter{transform:translateY(0);pointer-events:all}
 #pageCurtain.exit{transform:translateY(100%);pointer-events:none}
@@ -148,8 +146,7 @@ body{font-family:'DM Sans',sans-serif;background:#F8F5EE;color:#2C2C2A;min-heigh
 </style>
 </head>
 <body>
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+{% include 'components/cursor.html' %}
 <div id="pageCurtain"></div>
 <script>if(!localStorage.getItem('token')){window.location.href='/login/';}</script>
 
@@ -247,19 +244,8 @@ body{font-family:'DM Sans',sans-serif;background:#F8F5EE;color:#2C2C2A;min-heigh
 
 <div class="toast" id="errToast"></div>
 
+<script src="{% static 'js/cursor.js' %}"></script>
 <script>
-/* ── Cursor ── */
-const cur=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
-if(cur&&ring){
-  let mx=window.innerWidth/2,my=window.innerHeight/2,rx=mx,ry=my;
-  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
-  (function loop(){rx+=(mx-rx)*.13;ry+=(my-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
-  document.querySelectorAll('a,button,input,.dish-card,.qchip').forEach(el=>{
-    el.addEventListener('mouseenter',()=>{ring.style.transform='translate(-50%,-50%) scale(1.7)';ring.style.borderColor='rgba(212,168,67,1)';});
-    el.addEventListener('mouseleave',()=>{ring.style.transform='translate(-50%,-50%) scale(1)';ring.style.borderColor='rgba(212,168,67,.55)';});
-  });
-}
-
 /* ── Page curtain ── */
 (function(){
   const c=document.getElementById('pageCurtain');
