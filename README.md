@@ -222,5 +222,5 @@ docker-compose down
 ## 🤝 Contributors
 
 - **Mihir Rathod** ([@mihir021](https://github.com/mihir021)) — Project Lead, Full-Stack Architecture & Marketplace Engineering
-- **Yashvi Hirani** — Database Architecture, MongoDB Data Modeling & AI Recipe Planner Algorithm
+- **Yashvi Hirani** ([@YashviHirani](https://github.com/YashviHirani)) — Database Architecture, MongoDB Data Modeling & AI Recipe Planner Algorithm
 - **Mayank Rojesara** ([@mayank122340](https://github.com/mayank122340)) — Full-Stack Development, REST APIs & Admin Control Systems
