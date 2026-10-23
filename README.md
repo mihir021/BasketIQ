@@ -7,7 +7,6 @@
 [![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn%20%7C%20Pandas-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Docker](https://img.shields.io/badge/Container-Docker%20%7C%20Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![Render](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render&logoColor=black)](https://render.com/)
 
 > An intelligent, full-stack grocery e-commerce web platform integrated with an **AI Recipe Planner** that dynamically analyzes cart items to recommend high-precision recipes, paired with enterprise inventory management and financial tracking.
 
@@ -27,7 +26,6 @@
   - [Local Installation](#local-installation)
   - [Environment Variables (.env)](#environment-variables-env)
   - [Running with Docker](#running-with-docker)
-- [Deployment Guide (Render & Cloud)](#-deployment-guide)
 - [Contributors](#-contributors)
 
 ---
@@ -221,24 +219,8 @@ docker-compose down
 
 ---
 
-## 🌐 Deployment Guide
-
-### Why Render / Cloud Services instead of Vercel?
-BasketIQ is built with **Python 5.1, Gunicorn, Scikit-learn, Pandas, and MongoDB**. 
-- **Vercel** is primarily optimized for serverless frontend applications (Next.js, React, Vite). Its serverless functions impose a **50 MB bundle limit** and short execution timeouts, which fail when loading heavy data science packages like `scikit-learn` and `pandas`.
-- **Render.com** (or Railway / Fly.io) runs full Docker / Python runtime containers with background workers, persistent connections to MongoDB, and zero serverless constraints.
-
-### 1-Click Deployment on Render (Configured via `render.yaml`)
-1. Push your repository to GitHub.
-2. Sign in to [Render.com](https://render.com/).
-3. Click **New +** ➔ **Blueprint**.
-4. Select the `BasketIQ` repository. Render will automatically read `render.yaml`.
-5. Supply your `MONGO_URI` and `OPENAI_API_KEY` under the Environment Variables prompt.
-6. Click **Apply** — Render builds, migrates, and launches your live application!
-
----
-
 ## 🤝 Contributors
 
-- **Mihir** ([@mihir021](https://github.com/mihir021)) — Project Lead & Full-Stack Development
-- **Mayank Rojesara** ([@mayank122340](https://github.com/mayank122340)) — Full-Stack Architecture, REST APIs & ML Integration
+- **Mihir Rathod** ([@mihir021](https://github.com/mihir021)) — Project Lead, Full-Stack Architecture & Marketplace Engineering
+- **Yashvi Hirani** — Database Architecture, MongoDB Data Modeling & AI Recipe Planner Algorithm
+- **Mayank Rojesara** ([@mayank122340](https://github.com/mayank122340)) — Full-Stack Development, REST APIs & Admin Control Systems
